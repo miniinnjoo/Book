@@ -1,5 +1,5 @@
 import { useTranslation } from "react-i18next";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Search, ArrowRight, TrendingUp, ShieldCheck, Globe2, Zap, BookOpen } from "lucide-react";
 import { motion } from "motion/react";
 import { useEffect, useState } from "react";
@@ -11,6 +11,7 @@ import { cn } from "@/src/lib/utils";
 
 export default function Home() {
   const { t } = useTranslation();
+  const navigate = useNavigate();
   const [featuredBooks, setFeaturedBooks] = useState<BookListing[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -158,13 +159,14 @@ export default function Home() {
 
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 md:gap-8">
           {[
-            { title: t("gallery.fiction"), img: "https://images.unsplash.com/photo-1544947950-fa07a98d237f?auto=format&fit=crop&q=80&w=800", count: t("gallery.books_count", { count: "1,200" }), className: "col-span-1" },
-            { title: t("gallery.history"), img: "https://images.unsplash.com/photo-1461360370896-922624d12aa1?auto=format&fit=crop&q=80&w=800", count: t("gallery.books_count", { count: "850" }), className: "col-span-1" },
-            { title: t("gallery.science"), img: "https://images.unsplash.com/photo-1532094349884-543bc11b234d?auto=format&fit=crop&q=80&w=800", count: t("gallery.books_count", { count: "600" }), className: "col-span-1" }
+            { title: t("gallery.fiction"), id: "fiction", img: "https://images.unsplash.com/photo-1544947950-fa07a98d237f?auto=format&fit=crop&q=80&w=800", count: t("gallery.books_count", { count: "1,200" }), className: "col-span-1" },
+            { title: t("gallery.history"), id: "history", img: "https://images.unsplash.com/photo-1461360370896-922624d12aa1?auto=format&fit=crop&q=80&w=800", count: t("gallery.books_count", { count: "850" }), className: "col-span-1" },
+            { title: t("gallery.science"), id: "science", img: "https://images.unsplash.com/photo-1532094349884-543bc11b234d?auto=format&fit=crop&q=80&w=800", count: t("gallery.books_count", { count: "600" }), className: "col-span-1" }
           ].map((cat, i) => (
             <motion.div
               key={i}
               whileHover={{ y: -10 }}
+              onClick={() => navigate("/browse", { state: { category: cat.id } })}
               className={cn(
                 "relative aspect-[16/9] sm:aspect-[3/4] md:aspect-[4/5] rounded-[1.5rem] md:rounded-[3rem] overflow-hidden group cursor-pointer shadow-2xl shadow-stone-200/50 dark:shadow-none",
                 cat.className

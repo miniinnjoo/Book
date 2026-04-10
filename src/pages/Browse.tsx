@@ -1,6 +1,6 @@
 import { useTranslation } from "react-i18next";
 import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { collection, query, where, getDocs, orderBy, limit } from "firebase/firestore";
 import { db } from "@/src/firebase";
 import { BookListing } from "@/src/types";
@@ -12,6 +12,7 @@ import { motion, AnimatePresence } from "motion/react";
 
 export default function Browse() {
   const { t } = useTranslation();
+  const location = useLocation();
   const [books, setBooks] = useState<BookListing[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
@@ -27,6 +28,12 @@ export default function Browse() {
     publisher: "",
     year: "",
   });
+
+  useEffect(() => {
+    if (location.state?.category) {
+      setFilters(prev => ({ ...prev, category: location.state.category }));
+    }
+  }, [location.state]);
 
   const fetchBooks = async () => {
     setLoading(true);

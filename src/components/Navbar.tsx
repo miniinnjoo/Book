@@ -175,7 +175,7 @@ export default function Navbar() {
               <div className="relative group flex justify-center">
                 <Link to="/profile" className="flex items-center gap-2 p-1 hover:bg-primary/5 rounded-xl transition-colors group">
                   <img 
-                    src={user.photoURL || `https://ui-avatars.com/api/?name=${user.displayName}`} 
+                    src={user?.photoURL || `https://ui-avatars.com/api/?name=${user?.displayName || "User"}`} 
                     alt="Profile" 
                     className="w-8 h-8 rounded-lg object-cover border border-stone-200 dark:border-stone-800"
                   />

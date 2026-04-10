@@ -55,7 +55,7 @@ export default function ReviewForm({ sellerId, onSuccess }: ReviewFormProps) {
       await addDoc(collection(db, "reviews"), {
         sellerId,
         reviewerId: auth.currentUser.uid,
-        reviewerName: auth.currentUser.displayName || "Anonymous",
+        reviewerName: auth.currentUser?.displayName || "Anonymous",
         reviewerPhoto: auth.currentUser.photoURL || "",
         rating,
         comment: comment.trim(),

@@ -1,0 +1,157 @@
+{
+  "entities": {
+    "User": {
+      "title": "User",
+      "description": "User profile information",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string", "description": "Firebase Auth UID" },
+        "displayName": { "type": "string", "description": "User's display name" },
+        "email": { "type": "string", "format": "email", "description": "User's email" },
+        "photoURL": { "type": "string", "description": "User's profile picture URL" },
+        "role": { "type": "string", "enum": ["user", "admin"], "description": "User role" },
+        "rating": { "type": "number", "description": "Average rating" },
+        "reviewCount": { "type": "number", "description": "Number of reviews" },
+        "createdAt": { "type": "string", "format": "date-time", "description": "Account creation timestamp" }
+      },
+      "required": ["uid", "email", "role"]
+    },
+    "Book": {
+      "title": "Book",
+      "description": "Book listing information",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "description": "Book ID" },
+        "sellerId": { "type": "string", "description": "UID of the seller" },
+        "title": { "type": "string", "description": "Book title" },
+        "author": { "type": "string", "description": "Book author" },
+        "category": { "type": "string", "description": "Book category" },
+        "language": { "type": "string", "description": "Book language" },
+        "condition": { "type": "string", "enum": ["new", "like-new", "good", "acceptable"], "description": "Book condition" },
+        "price": { "type": "number", "description": "Selling price" },
+        "images": { "type": "array", "items": { "type": "string" }, "description": "URLs of book images" },
+        "description": { "type": "string", "description": "Book description" },
+        "location": { "type": "string", "description": "Seller's location" },
+        "status": { "type": "string", "enum": ["available", "sold", "pending"], "description": "Listing status" },
+        "createdAt": { "type": "string", "format": "date-time", "description": "Listing creation timestamp" },
+        "isFeatured": { "type": "boolean", "description": "Whether the listing is featured" }
+      },
+      "required": ["sellerId", "title", "author", "category", "price", "status"]
+    },
+    "Transaction": {
+      "title": "Transaction",
+      "description": "Information about a book purchase",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "description": "Transaction ID" },
+        "bookId": { "type": "string", "description": "ID of the book purchased" },
+        "bookTitle": { "type": "string", "description": "Title of the book" },
+        "buyerId": { "type": "string", "description": "UID of the buyer" },
+        "sellerId": { "type": "string", "description": "UID of the seller" },
+        "amount": { "type": "number", "description": "Total amount paid" },
+        "commission": { "type": "number", "description": "1% commission taken by platform" },
+        "status": { "type": "string", "enum": ["pending", "completed", "cancelled", "shipped", "delivered"], "description": "Transaction status" },
+        "paymentIntentId": { "type": "string", "description": "Stripe Payment Intent ID" },
+        "createdAt": { "type": "string", "format": "date-time", "description": "Transaction timestamp" }
+      },
+      "required": ["bookId", "buyerId", "sellerId", "amount", "commission", "status"]
+    },
+    "Chat": {
+      "title": "Chat",
+      "description": "Conversation between buyer and seller",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "description": "Chat ID" },
+        "participants": { "type": "array", "items": { "type": "string" }, "description": "UIDs of participants" },
+        "bookId": { "type": "string", "description": "ID of the book the chat is about" },
+        "lastMessage": { "type": "string", "description": "Content of the last message" },
+        "updatedAt": { "type": "string", "format": "date-time", "description": "Last message timestamp" }
+      },
+      "required": ["participants", "bookId"]
+    },
+    "Message": {
+      "title": "Message",
+      "description": "A single message in a chat",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "description": "Message ID" },
+        "chatId": { "type": "string", "description": "ID of the chat" },
+        "senderId": { "type": "string", "description": "UID of the sender" },
+        "text": { "type": "string", "description": "Message content" },
+        "createdAt": { "type": "string", "format": "date-time", "description": "Message timestamp" }
+      },
+      "required": ["chatId", "senderId", "text"]
+    },
+    "Notification": {
+      "title": "Notification",
+      "description": "In-app notification for a user",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "description": "Notification ID" },
+        "userId": { "type": "string", "description": "UID of the recipient" },
+        "type": { "type": "string", "enum": ["message", "order", "offer"], "description": "Notification type" },
+        "title": { "type": "string", "description": "Notification title" },
+        "message": { "type": "string", "description": "Notification content" },
+        "link": { "type": "string", "description": "Link to relevant page" },
+        "read": { "type": "boolean", "description": "Whether the notification has been read" },
+        "createdAt": { "type": "string", "format": "date-time", "description": "Notification timestamp" }
+      },
+      "required": ["userId", "type", "title", "message", "read"]
+    },
+    "Wishlist": {
+      "title": "Wishlist",
+      "description": "User's saved books",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "description": "Wishlist item ID" },
+        "userId": { "type": "string", "description": "UID of the user" },
+        "bookId": { "type": "string", "description": "ID of the saved book" },
+        "createdAt": { "type": "string", "format": "date-time", "description": "Timestamp when added" }
+      },
+      "required": ["userId", "bookId"]
+    },
+    "Review": {
+      "title": "Review",
+      "description": "User review for a seller",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "description": "Review ID" },
+        "sellerId": { "type": "string", "description": "UID of the seller being reviewed" },
+        "reviewerId": { "type": "string", "description": "UID of the user leaving the review" },
+        "reviewerName": { "type": "string", "description": "Name of the reviewer" },
+        "reviewerPhoto": { "type": "string", "description": "Photo of the reviewer" },
+        "rating": { "type": "number", "description": "Rating from 1 to 5" },
+        "comment": { "type": "string", "description": "Review text" },
+        "createdAt": { "type": "string", "format": "date-time", "description": "Review timestamp" }
+      },
+      "required": ["sellerId", "reviewerId", "rating", "comment", "createdAt"]
+    },
+    "Offer": {
+      "title": "Offer",
+      "description": "Price offer for a book",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "description": "Offer ID" },
+        "bookId": { "type": "string", "description": "ID of the book" },
+        "bookTitle": { "type": "string", "description": "Title of the book" },
+        "buyerId": { "type": "string", "description": "UID of the buyer" },
+        "sellerId": { "type": "string", "description": "UID of the seller" },
+        "amount": { "type": "number", "description": "Offered amount" },
+        "status": { "type": "string", "enum": ["pending", "accepted", "rejected", "cancelled"], "description": "Offer status" },
+        "createdAt": { "type": "string", "format": "date-time", "description": "Offer timestamp" }
+      },
+      "required": ["bookId", "buyerId", "sellerId", "amount", "status"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": { "schema": "User", "description": "User profiles" },
+    "/books/{bookId}": { "schema": "Book", "description": "Book listings" },
+    "/transactions/{transactionId}": { "schema": "Transaction", "description": "Purchase transactions" },
+    "/chats/{chatId}": { "schema": "Chat", "description": "Chat rooms" },
+    "/chats/{chatId}/messages/{messageId}": { "schema": "Message", "description": "Messages within a chat" },
+    "/notifications/{notificationId}": { "schema": "Notification", "description": "User notifications" },
+    "/wishlists/{wishlistId}": { "schema": "Wishlist", "description": "User wishlists" },
+    "/reviews/{reviewId}": { "schema": "Review", "description": "Seller reviews" },
+    "/offers/{offerId}": { "schema": "Offer", "description": "Price offers" }
+  }
+}

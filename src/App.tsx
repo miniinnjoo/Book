@@ -17,6 +17,7 @@ import Privacy from "./pages/Privacy";
 import Support from "./pages/Support";
 import Admin from "./pages/Admin";
 import Blog from "./pages/Blog";
+import BlogPost from "./pages/BlogPost";
 import { auth, db } from "./firebase";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { doc, getDoc, setDoc } from "firebase/firestore";
@@ -97,6 +98,7 @@ export default function App() {
             <Route path="/privacy" element={<Privacy />} />
             <Route path="/support" element={<Support />} />
             <Route path="/blog" element={<Blog />} />
+            <Route path="/blog/:id" element={<BlogPost />} />
             <Route path="/admin" element={user ? <Admin /> : <Navigate to="/login" />} />
           </Routes>
         </main>

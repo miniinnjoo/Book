@@ -36,33 +36,33 @@ export default function BookCard({ book, onDelete }: any) {
       className="group relative bg-white dark:bg-stone-900 rounded-[1.5rem] border border-stone-200 dark:border-stone-800 overflow-hidden hover:shadow-xl hover:shadow-stone-200/30 dark:hover:shadow-none transition-all duration-500"
     >
       {/* Action Buttons */}
-      <div className="absolute top-4 left-4 z-10 flex flex-col gap-2">
+      <div className="absolute top-2 md:top-4 left-2 md:left-4 z-10 flex flex-col gap-1 md:gap-2">
         <button 
           onClick={(e) => {
             e.preventDefault();
             e.stopPropagation();
             toggleWishlist();
           }}
-          className={`p-2.5 rounded-xl backdrop-blur-md transition-all duration-500 ${
+          className={`p-2 md:p-2.5 rounded-lg md:rounded-xl backdrop-blur-md transition-all duration-500 ${
             isInWishlist 
               ? "bg-rose-500 text-white shadow-lg shadow-rose-200" 
               : "bg-white/80 dark:bg-stone-950/80 text-stone-400 hover:text-rose-500 hover:bg-white dark:hover:bg-stone-950 shadow-sm"
           }`}
         >
-          <Heart className={`w-4 h-4 ${isInWishlist ? "fill-current" : ""}`} />
+          <Heart className={`w-3 h-3 md:w-4 md:h-4 ${isInWishlist ? "fill-current" : ""}`} />
         </button>
 
         {isOwner && (
           <button 
             onClick={handleDelete}
-            className="p-2.5 bg-white/80 dark:bg-stone-950/80 backdrop-blur-md text-stone-400 hover:text-primary hover:bg-white dark:hover:bg-stone-950 rounded-xl shadow-sm transition-all duration-500"
+            className="p-2 md:p-2.5 bg-white/80 dark:bg-stone-950/80 backdrop-blur-md text-stone-400 hover:text-primary hover:bg-white dark:hover:bg-stone-950 rounded-lg md:rounded-xl shadow-sm transition-all duration-500"
           >
-            <Trash2 className="w-4 h-4" />
+            <Trash2 className="w-3 h-3 md:w-4 md:h-4" />
           </button>
         )}
       </div>
 
-      <Link to={`/book/${book.id}`} className="block relative aspect-[3/4] overflow-hidden m-3 rounded-[1.2rem]">
+      <Link to={`/book/${book.id}`} className="block relative aspect-[3/4] overflow-hidden m-2 md:m-3 rounded-lg md:rounded-[1.2rem]">
         <img
           src={book.images[0] || `https://picsum.photos/seed/${book.id}/400/600`}
           alt={book.title}
@@ -74,24 +74,20 @@ export default function BookCard({ book, onDelete }: any) {
         </div>
       </Link>
 
-      <div className="p-4 md:p-6 pt-1">
-        <div className="space-y-1 mb-3 md:mb-4">
-          <Link to={`/book/${book.id}`} className="block text-lg md:text-xl font-black text-stone-900 dark:text-stone-50 hover:text-primary transition-colors line-clamp-1 tracking-tighter leading-tight">
+      <div className="p-3 md:p-6 pt-1">
+        <div className="space-y-1 mb-2 md:mb-4">
+          <Link to={`/book/${book.id}`} className="block text-base md:text-xl font-black text-stone-900 dark:text-stone-50 hover:text-primary transition-colors line-clamp-1 tracking-tighter leading-tight">
             {book.title}
           </Link>
-          <p className="text-[10px] md:text-xs text-stone-500 dark:text-stone-400 font-medium italic">
+          <p className="text-[9px] md:text-xs text-stone-500 dark:text-stone-400 font-medium italic">
             {t("book.by") || "بواسطة"} {book.author}
           </p>
         </div>
         
-        <div className="flex items-center justify-between pt-3 md:pt-4 border-t border-stone-100 dark:border-stone-800">
-          <span className="text-lg md:text-xl font-black text-primary tracking-tighter">
+        <div className="flex items-center justify-between pt-2 md:pt-4 border-t border-stone-100 dark:border-stone-800">
+          <span className="text-base md:text-xl font-black text-primary tracking-tighter">
             {formatPrice(book.price)}
           </span>
-          <div className="flex items-center gap-1.5 text-stone-500 dark:text-stone-400 bg-stone-50 dark:bg-stone-950 px-2 py-1 rounded-lg border border-stone-200 dark:border-stone-800">
-            <MapPin className="w-3 h-3" />
-            <span className="text-[7px] md:text-[9px] font-black uppercase tracking-widest">{book.location}</span>
-          </div>
         </div>
       </div>
     </motion.div>

@@ -7,6 +7,7 @@ import { collection, query, limit, getDocs, where } from "firebase/firestore";
 import { db } from "@/src/firebase";
 import { BookListing } from "@/src/types";
 import BookCard from "@/src/components/BookCard";
+import { cn } from "@/src/lib/utils";
 
 export default function Home() {
   const { t } = useTranslation();
@@ -155,22 +156,25 @@ export default function Home() {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 md:gap-8">
           {[
-            { title: t("gallery.fiction"), img: "https://images.unsplash.com/photo-1544947950-fa07a98d237f?auto=format&fit=crop&q=80&w=800", count: t("gallery.books_count", { count: "1,200" }) },
-            { title: t("gallery.history"), img: "https://images.unsplash.com/photo-1461360370896-922624d12aa1?auto=format&fit=crop&q=80&w=800", count: t("gallery.books_count", { count: "850" }) },
-            { title: t("gallery.science"), img: "https://images.unsplash.com/photo-1532094349884-543bc11b234d?auto=format&fit=crop&q=80&w=800", count: t("gallery.books_count", { count: "600" }) }
+            { title: t("gallery.fiction"), img: "https://images.unsplash.com/photo-1544947950-fa07a98d237f?auto=format&fit=crop&q=80&w=800", count: t("gallery.books_count", { count: "1,200" }), className: "col-span-1" },
+            { title: t("gallery.history"), img: "https://images.unsplash.com/photo-1461360370896-922624d12aa1?auto=format&fit=crop&q=80&w=800", count: t("gallery.books_count", { count: "850" }), className: "col-span-1" },
+            { title: t("gallery.science"), img: "https://images.unsplash.com/photo-1532094349884-543bc11b234d?auto=format&fit=crop&q=80&w=800", count: t("gallery.books_count", { count: "600" }), className: "col-span-1" }
           ].map((cat, i) => (
             <motion.div
               key={i}
               whileHover={{ y: -10 }}
-              className="relative aspect-[4/5] rounded-[2rem] md:rounded-[3rem] overflow-hidden group cursor-pointer shadow-2xl shadow-stone-200/50 dark:shadow-none"
+              className={cn(
+                "relative aspect-[16/9] sm:aspect-[3/4] md:aspect-[4/5] rounded-[1.5rem] md:rounded-[3rem] overflow-hidden group cursor-pointer shadow-2xl shadow-stone-200/50 dark:shadow-none",
+                cat.className
+              )}
             >
               <img src={cat.img} alt={cat.title} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
               <div className="absolute inset-0 bg-gradient-to-t from-stone-900/90 via-stone-900/20 to-transparent opacity-80 group-hover:opacity-100 transition-opacity"></div>
-              <div className="absolute bottom-6 md:bottom-10 left-6 md:left-10 space-y-1 md:space-y-2 text-left rtl:text-right">
-                <p className="text-[8px] md:text-[10px] font-black text-secondary uppercase tracking-[0.3em]">{cat.count}</p>
-                <h3 className="text-2xl md:text-4xl font-black text-white tracking-tighter uppercase">{cat.title}</h3>
+              <div className="absolute bottom-4 md:bottom-10 left-4 md:left-10 right-4 md:right-10 space-y-0.5 md:space-y-2 text-left rtl:text-right">
+                <p className="text-[7px] md:text-[10px] font-black text-secondary uppercase tracking-[0.2em] md:tracking-[0.3em]">{cat.count}</p>
+                <h3 className="text-lg md:text-4xl font-black text-white tracking-tighter uppercase leading-tight">{cat.title}</h3>
               </div>
             </motion.div>
           ))}
@@ -198,13 +202,13 @@ export default function Home() {
         </div>
 
         {loading ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-10">
             {[1, 2, 3, 4].map((i) => (
-              <div key={i} className="aspect-[3/4] bg-stone-100 rounded-[2.5rem] animate-pulse border border-stone-100"></div>
+              <div key={i} className="aspect-[3/4] bg-stone-100 rounded-[1.5rem] md:rounded-[2.5rem] animate-pulse border border-stone-100"></div>
             ))}
           </div>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-10">
             {featuredBooks.map((book, i) => (
               <motion.div
                 key={book.id}

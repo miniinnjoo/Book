@@ -14,10 +14,18 @@ service cloud.firestore {
          request.auth.token.email == "mini.innjoo@gmail.com");
     }
 
-    // User profiles
+    // User profiles (Private)
     match /users/{userId} {
-      allow read: if isAuthenticated();
+      allow read: if isOwner(userId) || isAdmin();
       allow create: if isOwner(userId) && request.resource.data.role == 'user';
+      allow update: if isOwner(userId) || isAdmin();
+      allow delete: if isAdmin();
+    }
+
+    // Public Profiles (Publicly readable)
+    match /public_profiles/{userId} {
+      allow read: if true;
+      allow create: if isOwner(userId);
       allow update: if isOwner(userId) || isAdmin();
       allow delete: if isAdmin();
     }
@@ -79,6 +87,13 @@ service cloud.firestore {
       allow create: if isAuthenticated() && request.resource.data.buyerId == request.auth.uid;
       allow update: if isAuthenticated() && (resource.data.buyerId == request.auth.uid || resource.data.sellerId == request.auth.uid || isAdmin());
       allow delete: if isAuthenticated() && (resource.data.buyerId == request.auth.uid || isAdmin());
+    }
+
+    // Shopping Carts
+    match /carts/{cartItemId} {
+      allow read: if isAuthenticated() && resource.data.userId == request.auth.uid;
+      allow create: if isAuthenticated() && request.resource.data.userId == request.auth.uid;
+      allow delete: if isAuthenticated() && resource.data.userId == request.auth.uid;
     }
   }
 }

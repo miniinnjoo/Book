@@ -5,7 +5,7 @@ import { db, auth } from "@/src/firebase";
 import { BookListing, UserProfile } from "@/src/types";
 import { useTranslation } from "react-i18next";
 import { formatPrice } from "@/src/lib/utils";
-import { MapPin, User, ShieldCheck, MessageSquare, CreditCard, ArrowLeft, Star, Clock, Heart, Edit3, TrendingUp, Zap, X, Loader2 } from "lucide-react";
+import { MapPin, User, ShieldCheck, MessageSquare, CreditCard, ArrowLeft, Star, Clock, Heart, Edit3, TrendingUp, Zap, X, Loader2, ShoppingCart } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 import { loadStripe } from "@stripe/stripe-js";
 import { useWishlist } from "@/src/hooks/useWishlist";
@@ -25,7 +25,48 @@ export default function BookDetails() {
   const [isOfferModalOpen, setIsOfferModalOpen] = useState(false);
   const [offerAmount, setOfferAmount] = useState("");
   const [offerLoading, setOfferLoading] = useState(false);
+  const [cartLoading, setCartLoading] = useState(false);
+  const [isInCart, setIsInCart] = useState(false);
   const { isInWishlist, toggleWishlist } = useWishlist(id);
+
+  useEffect(() => {
+    const checkCart = async () => {
+      if (!auth.currentUser || !id) return;
+      const q = query(
+        collection(db, "carts"),
+        where("userId", "==", auth.currentUser.uid),
+        where("bookId", "==", id)
+      );
+      const snap = await getDocs(q);
+      setIsInCart(!snap.empty);
+    };
+    checkCart();
+  }, [id, auth.currentUser]);
+
+  const handleAddToCart = async () => {
+    if (!auth.currentUser) {
+      navigate("/login");
+      return;
+    }
+    if (!book || isInCart) return;
+
+    setCartLoading(true);
+    try {
+      await addDoc(collection(db, "carts"), {
+        userId: auth.currentUser.uid,
+        bookId: book.id,
+        bookTitle: book.title,
+        price: book.price,
+        sellerId: book.sellerId,
+        createdAt: new Date().toISOString(),
+      });
+      setIsInCart(true);
+    } catch (error) {
+      console.error("Error adding to cart:", error);
+    } finally {
+      setCartLoading(false);
+    }
+  };
 
   useEffect(() => {
     const fetchDetails = async () => {
@@ -36,7 +77,7 @@ export default function BookDetails() {
           const bookData = { id: bookSnap.id, ...bookSnap.data() } as BookListing;
           setBook(bookData);
           
-          const sellerSnap = await getDoc(doc(db, "users", bookData.sellerId));
+          const sellerSnap = await getDoc(doc(db, "public_profiles", bookData.sellerId));
           if (sellerSnap.exists()) {
             setSeller(sellerSnap.data() as UserProfile);
           }
@@ -243,13 +284,6 @@ export default function BookDetails() {
               <p className="text-[9px] font-black text-stone-400 uppercase tracking-[0.3em]">{t("filter.price")}</p>
               <p className="text-3xl md:text-4xl font-black text-primary tracking-tighter">{formatPrice(book.price)}</p>
             </div>
-            <div className="text-right space-y-1">
-              <p className="text-[9px] font-black text-stone-400 uppercase tracking-[0.3em]">{t("book.location") || "الموقع"}</p>
-              <div className="flex items-center gap-2 text-stone-900 dark:text-white font-black text-lg tracking-tight">
-                <MapPin className="w-4 h-4 text-primary" />
-                {book.location}
-              </div>
-            </div>
           </div>
 
           <div className="space-y-3">
@@ -329,6 +363,15 @@ export default function BookDetails() {
                 >
                   <Zap className="w-6 h-6 group-hover:scale-110 transition-transform" />
                   {t("book.buy")} — {formatPrice(book.price)}
+                </button>
+
+                <button
+                  onClick={handleAddToCart}
+                  disabled={cartLoading || isInCart || book.sellerId === auth.currentUser?.uid}
+                  className="px-10 py-5 bg-white dark:bg-stone-800 text-primary border-2 border-primary rounded-2xl font-black text-lg hover:bg-primary/5 transition-all duration-500 flex items-center justify-center gap-4 shadow-xl shadow-primary/5 disabled:opacity-50"
+                >
+                  <ShoppingCart className="w-6 h-6" />
+                  {isInCart ? t("book.already_in_cart") : t("book.add_to_cart")}
                 </button>
                 
                 <div className="flex gap-3">

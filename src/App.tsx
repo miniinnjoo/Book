@@ -10,6 +10,7 @@ import EditBook from "./pages/EditBook";
 import Login from "./pages/Login";
 import Profile from "./pages/Profile";
 import Chat from "./pages/Chat";
+import Cart from "./pages/Cart";
 import Purchases from "./pages/Purchases";
 import Wishlist from "./pages/Wishlist";
 import Privacy from "./pages/Privacy";
@@ -35,13 +36,23 @@ export default function App() {
         const userRef = doc(db, "users", user.uid);
         const userSnap = await getDoc(userRef);
         if (!userSnap.exists()) {
-          await setDoc(userRef, {
+          const userData = {
             uid: user.uid,
             displayName: user.displayName || "Anonymous",
             email: user.email,
             photoURL: user.photoURL || "",
             role: "user",
             createdAt: new Date().toISOString(),
+          };
+          await setDoc(userRef, userData);
+          
+          // Sync to public profile
+          await setDoc(doc(db, "public_profiles", user.uid), {
+            uid: user.uid,
+            displayName: userData.displayName,
+            photoURL: userData.photoURL,
+            rating: 0,
+            reviewCount: 0
           });
         }
       };
@@ -79,6 +90,7 @@ export default function App() {
             <Route path="/profile" element={user ? <Profile /> : <Navigate to="/login" />} />
             <Route path="/profile/:id" element={<Profile />} />
             <Route path="/chat" element={user ? <Chat /> : <Navigate to="/login" />} />
+            <Route path="/cart" element={user ? <Cart /> : <Navigate to="/login" />} />
             <Route path="/purchases" element={user ? <Purchases /> : <Navigate to="/login" />} />
             <Route path="/wishlist" element={user ? <Wishlist /> : <Navigate to="/login" />} />
             <Route path="/privacy" element={<Privacy />} />

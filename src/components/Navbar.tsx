@@ -1,6 +1,6 @@
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { BookOpen, Search, PlusCircle, User, LogIn, MessageSquare, ShieldCheck, Sun, Moon, Menu, X, Heart, ShoppingBag } from "lucide-react";
+import { BookOpen, Search, PlusCircle, User, LogIn, MessageSquare, ShieldCheck, Sun, Moon, Menu, X, Heart, ShoppingCart } from "lucide-react";
 import { auth } from "@/src/firebase";
 import { useAuthState } from "react-firebase-hooks/auth";
 import LanguageSwitcher from "./LanguageSwitcher";
@@ -133,7 +133,15 @@ export default function Navbar() {
                   <MessageSquare className="w-5 h-5" />
                 </Link>
                 <div className="absolute top-full mt-2 px-3 py-1.5 bg-stone-900 text-white text-[10px] font-bold rounded-lg opacity-0 group-hover:opacity-100 transition-all duration-300 pointer-events-none whitespace-nowrap shadow-xl translate-y-2 group-hover:translate-y-0">
-                  المحادثات
+                  {t("chat.title") || "المحادثات"}
+                </div>
+              </div>
+              <div className="relative group flex justify-center">
+                <Link to="/cart" className="w-10 h-10 flex items-center justify-center text-stone-500 hover:text-primary dark:text-stone-400 dark:hover:text-primary hover:bg-primary/5 rounded-xl transition-colors">
+                  <ShoppingCart className="w-5 h-5" />
+                </Link>
+                <div className="absolute top-full mt-2 px-3 py-1.5 bg-stone-900 text-white text-[10px] font-bold rounded-lg opacity-0 group-hover:opacity-100 transition-all duration-300 pointer-events-none whitespace-nowrap shadow-xl translate-y-2 group-hover:translate-y-0">
+                  {t("nav.cart") || "السلة"}
                 </div>
               </div>
               {user.email === "mini.innjoo@gmail.com" && (

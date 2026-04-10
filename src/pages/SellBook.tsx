@@ -22,7 +22,6 @@ export default function SellBook() {
     condition: "good",
     price: "",
     description: "",
-    location: "",
     images: [] as string[],
   });
 
@@ -193,7 +192,6 @@ export default function SellBook() {
             </div>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
             <div className="space-y-2">
               <label className="text-[9px] font-black text-stone-400 dark:text-stone-500 uppercase tracking-[0.2em] ml-1">{t("sell.price")}</label>
               <input
@@ -205,18 +203,6 @@ export default function SellBook() {
                 placeholder={t("sell.price_placeholder")}
               />
             </div>
-            <div className="space-y-2">
-              <label className="text-[9px] font-black text-stone-400 dark:text-stone-500 uppercase tracking-[0.2em] ml-1">{t("sell.location")}</label>
-              <input
-                required
-                type="text"
-                value={formData.location}
-                onChange={(e) => setFormData({ ...formData, location: e.target.value })}
-                className="w-full px-5 py-3 bg-stone-50 dark:bg-stone-50 border border-stone-100 dark:border-stone-200 rounded-xl focus:outline-none focus:border-primary focus:ring-4 focus:ring-primary/5 transition-all font-medium text-stone-900 text-sm"
-                placeholder={t("sell.location_placeholder")}
-              />
-            </div>
-          </div>
 
           <div className="space-y-2">
             <div className="flex items-center justify-between px-1">

@@ -5,6 +5,7 @@ export interface UserProfile {
   photoURL: string;
   coverURL?: string;
   bio?: string;
+  address?: string;
   phoneNumber?: string;
   isEmailVerified?: boolean;
   isPhoneVerified?: boolean;
@@ -26,7 +27,6 @@ export interface BookListing {
   price: number;
   images: string[];
   description: string;
-  location: string;
   status: "available" | "sold" | "pending";
   createdAt: string;
   isFeatured?: boolean;
@@ -40,6 +40,7 @@ export interface Transaction {
   sellerId: string;
   amount: number;
   commission: number;
+  shippingAddress?: string;
   status: "pending" | "completed" | "cancelled" | "shipped" | "delivered";
   paymentIntentId?: string;
   createdAt: string;
@@ -53,6 +54,16 @@ export interface Offer {
   sellerId: string;
   amount: number;
   status: "pending" | "accepted" | "rejected" | "cancelled";
+  createdAt: string;
+}
+
+export interface CartItem {
+  id: string;
+  userId: string;
+  bookId: string;
+  bookTitle: string;
+  price: number;
+  sellerId: string;
   createdAt: string;
 }
 

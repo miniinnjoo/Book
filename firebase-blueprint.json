@@ -12,9 +12,23 @@
         "role": { "type": "string", "enum": ["user", "admin"], "description": "User role" },
         "rating": { "type": "number", "description": "Average rating" },
         "reviewCount": { "type": "number", "description": "Number of reviews" },
+        "address": { "type": "string", "description": "User's shipping address" },
         "createdAt": { "type": "string", "format": "date-time", "description": "Account creation timestamp" }
       },
       "required": ["uid", "email", "role"]
+    },
+    "PublicProfile": {
+      "title": "Public Profile",
+      "description": "Publicly accessible user information",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string", "description": "Unique user ID" },
+        "displayName": { "type": "string", "description": "User's full name" },
+        "photoURL": { "type": "string", "format": "uri", "description": "URL to user's profile picture" },
+        "rating": { "type": "number", "description": "Average rating" },
+        "reviewCount": { "type": "number", "description": "Number of reviews" }
+      },
+      "required": ["uid", "displayName"]
     },
     "Book": {
       "title": "Book",
@@ -31,7 +45,6 @@
         "price": { "type": "number", "description": "Selling price" },
         "images": { "type": "array", "items": { "type": "string" }, "description": "URLs of book images" },
         "description": { "type": "string", "description": "Book description" },
-        "location": { "type": "string", "description": "Seller's location" },
         "status": { "type": "string", "enum": ["available", "sold", "pending"], "description": "Listing status" },
         "createdAt": { "type": "string", "format": "date-time", "description": "Listing creation timestamp" },
         "isFeatured": { "type": "boolean", "description": "Whether the listing is featured" }
@@ -50,6 +63,7 @@
         "sellerId": { "type": "string", "description": "UID of the seller" },
         "amount": { "type": "number", "description": "Total amount paid" },
         "commission": { "type": "number", "description": "1% commission taken by platform" },
+        "shippingAddress": { "type": "string", "description": "Shipping address for this order" },
         "status": { "type": "string", "enum": ["pending", "completed", "cancelled", "shipped", "delivered"], "description": "Transaction status" },
         "paymentIntentId": { "type": "string", "description": "Stripe Payment Intent ID" },
         "createdAt": { "type": "string", "format": "date-time", "description": "Transaction timestamp" }
@@ -141,10 +155,26 @@
         "createdAt": { "type": "string", "format": "date-time", "description": "Offer timestamp" }
       },
       "required": ["bookId", "buyerId", "sellerId", "amount", "status"]
+    },
+    "CartItem": {
+      "title": "Cart Item",
+      "description": "An item in the user's shopping cart",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "description": "Cart item ID" },
+        "userId": { "type": "string", "description": "UID of the user" },
+        "bookId": { "type": "string", "description": "ID of the book" },
+        "bookTitle": { "type": "string", "description": "Title of the book" },
+        "price": { "type": "number", "description": "Price at time of adding" },
+        "sellerId": { "type": "string", "description": "UID of the seller" },
+        "createdAt": { "type": "string", "format": "date-time", "description": "Timestamp when added" }
+      },
+      "required": ["userId", "bookId", "bookTitle", "price", "sellerId"]
     }
   },
   "firestore": {
     "/users/{userId}": { "schema": "User", "description": "User profiles" },
+    "/public_profiles/{userId}": { "schema": "PublicProfile", "description": "Publicly accessible user profiles" },
     "/books/{bookId}": { "schema": "Book", "description": "Book listings" },
     "/transactions/{transactionId}": { "schema": "Transaction", "description": "Purchase transactions" },
     "/chats/{chatId}": { "schema": "Chat", "description": "Chat rooms" },
@@ -152,6 +182,7 @@
     "/notifications/{notificationId}": { "schema": "Notification", "description": "User notifications" },
     "/wishlists/{wishlistId}": { "schema": "Wishlist", "description": "User wishlists" },
     "/reviews/{reviewId}": { "schema": "Review", "description": "Seller reviews" },
-    "/offers/{offerId}": { "schema": "Offer", "description": "Price offers" }
+    "/offers/{offerId}": { "schema": "Offer", "description": "Price offers" },
+    "/carts/{cartItemId}": { "schema": "CartItem", "description": "User shopping cart items" }
   }
 }

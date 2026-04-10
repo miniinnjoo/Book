@@ -16,7 +16,7 @@ export default function BookFilter({ filters, setFilters, onClear }: BookFilterP
   const conditions = ["new", "like-new", "good", "acceptable"];
 
   return (
-    <div className="bg-white dark:bg-stone-900 rounded-2xl md:rounded-[2rem] border border-stone-200 dark:border-stone-800 p-4 md:p-6 space-y-5 md:space-y-8 sticky top-24 shadow-2xl shadow-stone-200/30 dark:shadow-none transition-colors duration-500">
+    <div className="bg-white dark:bg-stone-900 rounded-2xl md:rounded-[2rem] border border-stone-200 dark:border-stone-800 p-4 md:p-6 space-y-4 md:space-y-8 lg:sticky lg:top-32 shadow-2xl shadow-stone-200/30 dark:shadow-none transition-colors duration-500">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2 md:gap-3">
           <div className="w-8 h-8 md:w-10 md:h-10 bg-primary/5 dark:bg-primary/10 rounded-lg md:rounded-xl flex items-center justify-center">
@@ -33,17 +33,17 @@ export default function BookFilter({ filters, setFilters, onClear }: BookFilterP
         </button>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 gap-8">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 gap-6 md:gap-8">
         {/* Category */}
-        <div className="space-y-4">
-          <label className="text-[10px] font-black text-stone-400 uppercase tracking-[0.3em] block">{t("filter.category")}</label>
-          <div className="flex flex-wrap gap-2">
+        <div className="space-y-3 md:space-y-4">
+          <label className="text-[9px] md:text-[10px] font-black text-stone-400 uppercase tracking-[0.3em] block">{t("filter.category")}</label>
+          <div className="flex flex-wrap gap-1.5 md:gap-2">
             {categories.map((cat) => (
               <button
                 key={cat}
                 onClick={() => setFilters({ ...filters, category: filters.category === cat ? "" : cat })}
                 className={cn(
-                  "px-4 py-2 rounded-xl text-xs font-black transition-all border-2 uppercase tracking-widest",
+                  "px-3 md:px-4 py-1.5 md:py-2 rounded-lg md:rounded-xl text-[9px] md:text-xs font-black transition-all border-2 uppercase tracking-widest",
                   filters.category === cat 
                     ? "bg-primary border-primary text-white shadow-xl shadow-primary/20" 
                     : "bg-stone-50 dark:bg-stone-950 border-stone-50 dark:border-stone-950 text-stone-500 dark:text-stone-400 hover:border-stone-200 dark:hover:border-stone-800"
@@ -56,15 +56,15 @@ export default function BookFilter({ filters, setFilters, onClear }: BookFilterP
         </div>
 
         {/* Language */}
-        <div className="space-y-4">
-          <label className="text-[10px] font-black text-stone-400 uppercase tracking-[0.3em] block">{t("filter.language")}</label>
-          <div className="flex flex-wrap gap-2">
+        <div className="space-y-3 md:space-y-4">
+          <label className="text-[9px] md:text-[10px] font-black text-stone-400 uppercase tracking-[0.3em] block">{t("filter.language")}</label>
+          <div className="flex flex-wrap gap-1.5 md:gap-2">
             {languages.map((lang) => (
               <button
                 key={lang}
                 onClick={() => setFilters({ ...filters, language: filters.language === lang ? "" : lang })}
                 className={cn(
-                  "px-4 py-2 rounded-xl text-xs font-black transition-all border-2 uppercase tracking-widest",
+                  "px-3 md:px-4 py-1.5 md:py-2 rounded-lg md:rounded-xl text-[9px] md:text-xs font-black transition-all border-2 uppercase tracking-widest",
                   filters.language === lang 
                     ? "bg-secondary border-secondary text-white shadow-xl shadow-secondary/20" 
                     : "bg-stone-50 dark:bg-stone-950 border-stone-50 dark:border-stone-950 text-stone-500 dark:text-stone-400 hover:border-stone-200 dark:hover:border-stone-800"
@@ -77,15 +77,15 @@ export default function BookFilter({ filters, setFilters, onClear }: BookFilterP
         </div>
 
         {/* Condition */}
-        <div className="space-y-4">
-          <label className="text-[10px] font-black text-stone-400 uppercase tracking-[0.3em] block">{t("filter.condition")}</label>
-          <div className="flex flex-wrap gap-2">
+        <div className="space-y-3 md:space-y-4">
+          <label className="text-[9px] md:text-[10px] font-black text-stone-400 uppercase tracking-[0.3em] block">{t("filter.condition")}</label>
+          <div className="flex flex-wrap gap-1.5 md:gap-2">
             {conditions.map((cond) => (
               <button
                 key={cond}
                 onClick={() => setFilters({ ...filters, condition: filters.condition === cond ? "" : cond })}
                 className={cn(
-                  "px-4 py-2 rounded-xl text-xs font-black transition-all border-2 uppercase tracking-widest",
+                  "px-3 md:px-4 py-1.5 md:py-2 rounded-lg md:rounded-xl text-[9px] md:text-xs font-black transition-all border-2 uppercase tracking-widest",
                   filters.condition === cond 
                     ? "bg-stone-900 dark:bg-stone-700 border-stone-900 dark:border-stone-700 text-white shadow-xl shadow-stone-900/20" 
                     : "bg-stone-50 dark:bg-stone-950 border-stone-50 dark:border-stone-950 text-stone-500 dark:text-stone-400 hover:border-stone-200 dark:hover:border-stone-800"
@@ -98,16 +98,16 @@ export default function BookFilter({ filters, setFilters, onClear }: BookFilterP
         </div>
 
         {/* Price Range */}
-        <div className="space-y-4">
-          <label className="text-[10px] font-black text-stone-400 uppercase tracking-[0.3em] block">{t("filter.price")}</label>
-          <div className="flex items-center gap-3">
+        <div className="space-y-3 md:space-y-4">
+          <label className="text-[9px] md:text-[10px] font-black text-stone-400 uppercase tracking-[0.3em] block">{t("filter.price")}</label>
+          <div className="flex items-center gap-2 md:gap-3">
             <div className="relative w-full">
               <input
                 type="number"
                 placeholder={t("filter.min")}
                 value={filters.minPrice}
                 onChange={(e) => setFilters({ ...filters, minPrice: e.target.value })}
-                className="w-full px-4 py-3 bg-stone-50 dark:bg-stone-950 border-2 border-stone-50 dark:border-stone-950 rounded-xl text-xs font-black focus:outline-none focus:border-primary transition-all text-stone-900 dark:text-stone-50"
+                className="w-full px-3 md:px-4 py-2 md:py-3 bg-stone-50 dark:bg-stone-950 border-2 border-stone-50 dark:border-stone-950 rounded-lg md:rounded-xl text-[10px] md:text-xs font-black focus:outline-none focus:border-primary transition-all text-stone-900 dark:text-stone-50"
               />
             </div>
             <span className="text-stone-300 dark:text-stone-700 font-black">-</span>
@@ -117,7 +117,7 @@ export default function BookFilter({ filters, setFilters, onClear }: BookFilterP
                 placeholder={t("filter.max")}
                 value={filters.maxPrice}
                 onChange={(e) => setFilters({ ...filters, maxPrice: e.target.value })}
-                className="w-full px-4 py-3 bg-stone-50 dark:bg-stone-950 border-2 border-stone-50 dark:border-stone-950 rounded-xl text-xs font-black focus:outline-none focus:border-primary transition-all text-stone-900 dark:text-stone-50"
+                className="w-full px-3 md:px-4 py-2 md:py-3 bg-stone-50 dark:bg-stone-950 border-2 border-stone-50 dark:border-stone-950 rounded-lg md:rounded-xl text-[10px] md:text-xs font-black focus:outline-none focus:border-primary transition-all text-stone-900 dark:text-stone-50"
               />
             </div>
           </div>

@@ -1,7 +1,7 @@
 import { useTranslation } from "react-i18next";
 import { auth, db } from "@/src/firebase";
 import { useAuthState } from "react-firebase-hooks/auth";
-import { collection, query, where, getDocs, orderBy, doc, getDoc, updateDoc, addDoc } from "firebase/firestore";
+import { collection, query, where, getDocs, orderBy, doc, getDoc, updateDoc, addDoc, setDoc } from "firebase/firestore";
 import { useEffect, useState } from "react";
 import { BookListing, Transaction, UserProfile, Offer } from "@/src/types";
 import BookCard from "@/src/components/BookCard";
@@ -45,6 +45,7 @@ export default function Profile() {
   const [editForm, setEditForm] = useState({
     displayName: "",
     bio: "",
+    address: "",
     photoURL: "",
     coverURL: "",
     phoneNumber: ""
@@ -53,7 +54,8 @@ export default function Profile() {
 
   const fetchProfile = async () => {
     if (!targetUid) return;
-    const docRef = doc(db, "users", targetUid);
+    const collectionName = isOwnProfile ? "users" : "public_profiles";
+    const docRef = doc(db, collectionName, targetUid);
     const docSnap = await getDoc(docRef);
     if (docSnap.exists()) {
       const data = docSnap.data() as UserProfile;
@@ -62,6 +64,7 @@ export default function Profile() {
         setEditForm({
           displayName: data.displayName || "",
           bio: data.bio || "",
+          address: data.address || "",
           photoURL: data.photoURL || "",
           coverURL: data.coverURL || "",
           phoneNumber: data.phoneNumber || ""
@@ -86,13 +89,24 @@ export default function Profile() {
       
       // Update Firestore Profile
       const docRef = doc(db, "users", user.uid);
-      await updateDoc(docRef, {
+      const updateData = {
         displayName: editForm.displayName.trim(),
         bio: editForm.bio.trim(),
+        address: editForm.address.trim(),
         photoURL: editForm.photoURL.trim(),
         coverURL: editForm.coverURL.trim(),
         phoneNumber: editForm.phoneNumber.trim()
-      });
+      };
+      await updateDoc(docRef, updateData);
+      
+      // Update Public Profile
+      const publicRef = doc(db, "public_profiles", user.uid);
+      await setDoc(publicRef, {
+        uid: user.uid,
+        displayName: updateData.displayName,
+        photoURL: updateData.photoURL,
+        bio: updateData.bio,
+      }, { merge: true });
       
       await fetchProfile();
       setIsEditing(false);
@@ -364,11 +378,21 @@ export default function Profile() {
                 <div className="space-y-6 max-h-[60vh] overflow-y-auto pr-4 custom-scrollbar">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div className="space-y-2">
-                      <label className="text-[10px] font-black uppercase tracking-widest text-stone-400 ml-4">{t("sell.book_title")}</label>
+                      <label className="text-[10px] font-black uppercase tracking-widest text-stone-400 ml-4">{t("profile.display_name") || "الاسم"}</label>
                       <input 
                         type="text" 
                         value={editForm.displayName}
                         onChange={(e) => setEditForm({...editForm, displayName: e.target.value})}
+                        className="w-full px-6 py-4 bg-stone-50 border border-stone-100 rounded-2xl focus:outline-none focus:border-primary font-medium"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <label className="text-[10px] font-black uppercase tracking-widest text-stone-400 ml-4">{t("profile.address") || "عنوان الشحن"}</label>
+                      <input 
+                        type="text" 
+                        value={editForm.address}
+                        onChange={(e) => setEditForm({...editForm, address: e.target.value})}
+                        placeholder={t("profile.address_placeholder") || "المدينة، الشارع، رقم البناية"}
                         className="w-full px-6 py-4 bg-stone-50 border border-stone-100 rounded-2xl focus:outline-none focus:border-primary font-medium"
                       />
                     </div>
@@ -578,6 +602,7 @@ export default function Profile() {
                       <tr>
                         <th className="px-8 py-6 text-[10px] font-black text-stone-400 uppercase tracking-widest">{t("sell.book_title")}</th>
                         <th className="px-8 py-6 text-[10px] font-black text-stone-400 uppercase tracking-widest">{t("admin.status")}</th>
+                        <th className="px-8 py-6 text-[10px] font-black text-stone-400 uppercase tracking-widest">{t("profile.address") || "العنوان"}</th>
                         <th className="px-8 py-6 text-[10px] font-black text-stone-400 uppercase tracking-widest">{t("admin.date")}</th>
                         <th className="px-8 py-6 text-[10px] font-black text-stone-400 uppercase tracking-widest text-right rtl:text-left">{t("book.price")}</th>
                       </tr>
@@ -598,6 +623,9 @@ export default function Profile() {
                               <option value="completed">Completed</option>
                               <option value="cancelled">Cancelled</option>
                             </select>
+                          </td>
+                          <td className="px-8 py-6 text-xs text-stone-500 max-w-[200px] truncate">
+                            {sale.shippingAddress || "N/A"}
                           </td>
                           <td className="px-8 py-6 text-xs text-stone-500">
                             {new Date(sale.createdAt).toLocaleDateString()}
@@ -630,7 +658,7 @@ export default function Profile() {
                       </div>
                       <div className="space-y-2">
                         <h4 className="text-xl font-black text-stone-900 dark:text-white tracking-tight">{purchase.bookTitle}</h4>
-                        <div className="flex items-center gap-3">
+                        <div className="flex flex-wrap items-center gap-3">
                           <span className={cn(
                             "px-3 py-1 rounded-full text-[8px] font-black uppercase tracking-widest border",
                             purchase.status === "completed" ? "bg-green-50 text-green-600 border-green-100" :
@@ -640,6 +668,12 @@ export default function Profile() {
                           )}>
                             {purchase.status}
                           </span>
+                          {purchase.shippingAddress && (
+                            <span className="text-[10px] text-stone-400 font-medium flex items-center gap-1">
+                              <Truck className="w-3 h-3" />
+                              {purchase.shippingAddress}
+                            </span>
+                          )}
                           <span className="text-xs text-stone-400 font-medium">{new Date(purchase.createdAt).toLocaleDateString()}</span>
                         </div>
                       </div>

@@ -104,6 +104,24 @@ export default function Navbar() {
               {t("nav.wishlist_desc") || "الكتب التي نالت إعجابك"}
             </div>
           </div>
+
+          <div className="relative group flex justify-center">
+            <Link 
+              to="/blog" 
+              className={cn(
+                "px-5 py-2 text-sm font-bold rounded-xl transition-all flex items-center gap-2",
+                location.pathname === "/blog" 
+                  ? "bg-primary text-white" 
+                  : "text-stone-500 hover:text-primary dark:text-stone-400 dark:hover:text-primary hover:bg-primary/5"
+              )}
+            >
+              <BookOpen className="w-4 h-4" />
+              {t("nav.blog") || "المدونة"}
+            </Link>
+            <div className="absolute top-full mt-2 px-3 py-1.5 bg-stone-900 text-white text-[10px] font-bold rounded-lg opacity-0 group-hover:opacity-100 transition-all duration-300 pointer-events-none whitespace-nowrap shadow-xl translate-y-2 group-hover:translate-y-0">
+              {t("nav.blog_desc") || "مقالات ونصائح القراءة"}
+            </div>
+          </div>
         </div>
 
         {/* Right: Actions */}
@@ -222,6 +240,14 @@ export default function Navbar() {
                 >
                   <Heart className="w-6 h-6 text-primary" />
                   <span className="font-bold text-stone-900 dark:text-stone-50">{t("nav.wishlist") || "المفضلة"}</span>
+                </Link>
+                <Link 
+                  to="/blog" 
+                  onClick={() => setIsMenuOpen(false)}
+                  className="flex items-center gap-4 p-4 bg-stone-50 dark:bg-stone-900 rounded-2xl"
+                >
+                  <BookOpen className="w-6 h-6 text-primary" />
+                  <span className="font-bold text-stone-900 dark:text-stone-50">{t("nav.blog") || "المدونة"}</span>
                 </Link>
                 {user && (
                   <>

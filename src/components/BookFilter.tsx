@@ -122,6 +122,34 @@ export default function BookFilter({ filters, setFilters, onClear }: BookFilterP
             </div>
           </div>
         </div>
+
+        {/* Advanced Search */}
+        <div className="space-y-3 md:space-y-4 pt-4 border-t border-stone-100 dark:border-stone-800">
+          <label className="text-[9px] md:text-[10px] font-black text-stone-400 uppercase tracking-[0.3em] block">{t("filter.advanced") || "بحث متقدم"}</label>
+          <div className="space-y-3">
+            <input
+              type="text"
+              placeholder="ISBN"
+              value={filters.isbn}
+              onChange={(e) => setFilters({ ...filters, isbn: e.target.value })}
+              className="w-full px-3 md:px-4 py-2 md:py-3 bg-stone-50 dark:bg-stone-950 border-2 border-stone-50 dark:border-stone-950 rounded-lg md:rounded-xl text-[10px] md:text-xs font-black focus:outline-none focus:border-primary transition-all text-stone-900 dark:text-stone-50"
+            />
+            <input
+              type="text"
+              placeholder={t("filter.publisher") || "دار النشر"}
+              value={filters.publisher}
+              onChange={(e) => setFilters({ ...filters, publisher: e.target.value })}
+              className="w-full px-3 md:px-4 py-2 md:py-3 bg-stone-50 dark:bg-stone-950 border-2 border-stone-50 dark:border-stone-950 rounded-lg md:rounded-xl text-[10px] md:text-xs font-black focus:outline-none focus:border-primary transition-all text-stone-900 dark:text-stone-50"
+            />
+            <input
+              type="text"
+              placeholder={t("filter.year") || "سنة النشر"}
+              value={filters.year}
+              onChange={(e) => setFilters({ ...filters, year: e.target.value })}
+              className="w-full px-3 md:px-4 py-2 md:py-3 bg-stone-50 dark:bg-stone-950 border-2 border-stone-50 dark:border-stone-950 rounded-lg md:rounded-xl text-[10px] md:text-xs font-black focus:outline-none focus:border-primary transition-all text-stone-900 dark:text-stone-50"
+            />
+          </div>
+        </div>
       </div>
     </div>
   );

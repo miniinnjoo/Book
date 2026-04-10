@@ -23,6 +23,9 @@ export default function Browse() {
     condition: "",
     minPrice: "",
     maxPrice: "",
+    isbn: "",
+    publisher: "",
+    year: "",
   });
 
   const fetchBooks = async () => {
@@ -50,6 +53,9 @@ export default function Browse() {
       if (filters.condition) results = results.filter(b => b.condition === filters.condition);
       if (filters.minPrice) results = results.filter(b => b.price >= Number(filters.minPrice));
       if (filters.maxPrice) results = results.filter(b => b.price <= Number(filters.maxPrice));
+      if (filters.isbn) results = results.filter(b => b.isbn?.includes(filters.isbn));
+      if (filters.publisher) results = results.filter(b => b.publisher?.toLowerCase().includes(filters.publisher.toLowerCase()));
+      if (filters.year) results = results.filter(b => b.year === filters.year);
 
       setBooks(results);
     } catch (error) {
@@ -114,7 +120,7 @@ export default function Browse() {
             <BookFilter 
               filters={filters} 
               setFilters={setFilters} 
-              onClear={() => setFilters({ category: "", language: "", condition: "", minPrice: "", maxPrice: "" })} 
+              onClear={() => setFilters({ category: "", language: "", condition: "", minPrice: "", maxPrice: "", isbn: "", publisher: "", year: "" })} 
             />
           </div>
         </aside>
@@ -201,7 +207,7 @@ export default function Browse() {
                     </p>
                   </div>
                   <button 
-                    onClick={() => setFilters({ category: "", language: "", condition: "", minPrice: "", maxPrice: "" })}
+                    onClick={() => setFilters({ category: "", language: "", condition: "", minPrice: "", maxPrice: "", isbn: "", publisher: "", year: "" })}
                     className="px-8 md:px-12 py-4 md:py-6 bg-primary text-white rounded-xl md:rounded-[2rem] font-black text-xs md:text-sm uppercase tracking-widest hover:bg-primary/90 transition-all shadow-2xl shadow-primary/30"
                   >
                     {t("filter.clear")}

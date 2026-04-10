@@ -28,11 +28,11 @@ export default function Profile() {
 
   const [profileData, setProfileData] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState<"listings" | "purchases" | "wishlist" | "reviews" | "earnings" | "offers">("listings");
+  const [activeTab, setActiveTab] = useState<"listings" | "purchases" | "wishlist" | "reviews" | "earnings" | "offers" | "dashboard">("listings");
 
   useEffect(() => {
     const tab = searchParams.get("tab");
-    if (tab && ["listings", "purchases", "wishlist", "reviews", "earnings", "offers"].includes(tab)) {
+    if (tab && ["listings", "purchases", "wishlist", "reviews", "earnings", "offers", "dashboard"].includes(tab)) {
       setActiveTab(tab as any);
     }
   }, [searchParams]);
@@ -286,33 +286,50 @@ export default function Profile() {
                     {t("profile.verified")}
                   </div>
                 ) : (
-                  <div className="group relative">
-                    <div className="flex items-center gap-2 px-4 py-2 bg-stone-100 text-stone-400 rounded-2xl text-[10px] font-black uppercase tracking-widest border border-stone-200 cursor-help">
-                      <ShieldCheck className="w-3.5 h-3.5" />
-                      {t("profile.not_verified") || "غير موثق"}
+                  <div className="flex flex-col sm:flex-row items-center gap-3">
+                    <div className="group relative">
+                      <div className="flex items-center gap-2 px-4 py-2 bg-stone-100 text-stone-400 rounded-2xl text-[10px] font-black uppercase tracking-widest border border-stone-200 cursor-help">
+                        <ShieldCheck className="w-3.5 h-3.5" />
+                        {t("profile.not_verified") || "غير موثق"}
+                      </div>
+                      <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-4 w-64 p-6 bg-stone-900 text-white rounded-3xl text-xs font-medium opacity-0 group-hover:opacity-100 transition-all duration-500 pointer-events-none shadow-2xl z-50">
+                        <p className="mb-4 font-black uppercase tracking-widest text-[10px] text-secondary">{t("profile.verify_req")}</p>
+                        <ul className="space-y-3">
+                          <li className="flex items-center gap-3">
+                            {profileData?.isEmailVerified ? <Check className="w-4 h-4 text-green-400" /> : <CloseIcon className="w-4 h-4 text-primary" />}
+                            {t("profile.req_email")}
+                          </li>
+                          <li className="flex items-center gap-3">
+                            {profileData?.isPhoneVerified ? <Check className="w-4 h-4 text-green-400" /> : <CloseIcon className="w-4 h-4 text-primary" />}
+                            {t("profile.req_phone")}
+                          </li>
+                          <li className="flex items-center gap-3">
+                            {(profileData?.booksSold || 0) > 100 ? <Check className="w-4 h-4 text-green-400" /> : <CloseIcon className="w-4 h-4 text-primary" />}
+                            {t("profile.req_sales")} ({profileData?.booksSold || 0}/100)
+                          </li>
+                          <li className="flex items-center gap-3">
+                            {(profileData?.rating || 0) > 4.5 ? <Check className="w-4 h-4 text-green-400" /> : <CloseIcon className="w-4 h-4 text-primary" />}
+                            {t("profile.req_rating")} ({profileData?.rating || 0})
+                          </li>
+                        </ul>
+                        <div className="absolute top-full left-1/2 -translate-x-1/2 border-8 border-transparent border-t-stone-900"></div>
+                      </div>
                     </div>
-                    <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-4 w-64 p-6 bg-stone-900 text-white rounded-3xl text-xs font-medium opacity-0 group-hover:opacity-100 transition-all duration-500 pointer-events-none shadow-2xl z-50">
-                      <p className="mb-4 font-black uppercase tracking-widest text-[10px] text-secondary">{t("profile.verify_req")}</p>
-                      <ul className="space-y-3">
-                        <li className="flex items-center gap-3">
-                          {profileData?.isEmailVerified ? <Check className="w-4 h-4 text-green-400" /> : <CloseIcon className="w-4 h-4 text-primary" />}
-                          {t("profile.req_email")}
-                        </li>
-                        <li className="flex items-center gap-3">
-                          {profileData?.isPhoneVerified ? <Check className="w-4 h-4 text-green-400" /> : <CloseIcon className="w-4 h-4 text-primary" />}
-                          {t("profile.req_phone")}
-                        </li>
-                        <li className="flex items-center gap-3">
-                          {(profileData?.booksSold || 0) > 100 ? <Check className="w-4 h-4 text-green-400" /> : <CloseIcon className="w-4 h-4 text-primary" />}
-                          {t("profile.req_sales")} ({profileData?.booksSold || 0}/100)
-                        </li>
-                        <li className="flex items-center gap-3">
-                          {(profileData?.rating || 0) > 4.5 ? <Check className="w-4 h-4 text-green-400" /> : <CloseIcon className="w-4 h-4 text-primary" />}
-                          {t("profile.req_rating")} ({profileData?.rating || 0})
-                        </li>
-                      </ul>
-                      <div className="absolute top-full left-1/2 -translate-x-1/2 border-8 border-transparent border-t-stone-900"></div>
-                    </div>
+                    {isOwnProfile && (
+                      <button 
+                        onClick={async () => {
+                          if (profileData?.isEmailVerified && profileData?.isPhoneVerified) {
+                            await updateDoc(doc(db, "users", user.uid), { isVerified: true });
+                            await fetchProfile();
+                          } else {
+                            alert("يرجى إكمال متطلبات التوثيق أولاً");
+                          }
+                        }}
+                        className="px-4 py-2 bg-primary/10 text-primary rounded-2xl text-[10px] font-black uppercase tracking-widest hover:bg-primary hover:text-white transition-all"
+                      >
+                        {t("profile.request_verify") || "طلب توثيق"}
+                      </button>
+                    )}
                   </div>
                 )}
               </div>
@@ -490,6 +507,19 @@ export default function Profile() {
           </button>
           {isOwnProfile && (
             <button
+              onClick={() => setActiveTab("dashboard")}
+              className={`pb-6 text-sm font-black uppercase tracking-[0.2em] transition-all relative ${
+                activeTab === "dashboard" ? "text-primary" : "text-stone-400 hover:text-stone-600"
+              }`}
+            >
+              {t("profile.dashboard") || "لوحة التحكم"}
+              {activeTab === "dashboard" && (
+                <motion.div layoutId="tab" className="absolute bottom-0 left-0 right-0 h-1.5 bg-primary rounded-full" />
+              )}
+            </button>
+          )}
+          {isOwnProfile && (
+            <button
               onClick={() => setActiveTab("earnings")}
               className={`pb-6 text-sm font-black uppercase tracking-[0.2em] transition-all relative ${
                 activeTab === "earnings" ? "text-primary" : "text-stone-400 hover:text-stone-600"
@@ -570,6 +600,77 @@ export default function Profile() {
               </div>
             </div>
           )
+        ) : activeTab === "dashboard" ? (
+          <div className="space-y-12">
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+              <div className="p-8 bg-white dark:bg-stone-900 rounded-[2.5rem] border border-stone-100 dark:border-stone-800 shadow-xl shadow-stone-200/20 dark:shadow-none space-y-2">
+                <p className="text-[10px] font-black text-stone-400 uppercase tracking-widest">{t("profile.total_sales")}</p>
+                <h4 className="text-3xl font-black text-stone-900 dark:text-white tracking-tighter">{mySales.length}</h4>
+              </div>
+              <div className="p-8 bg-white dark:bg-stone-900 rounded-[2.5rem] border border-stone-100 dark:border-stone-800 shadow-xl shadow-stone-200/20 dark:shadow-none space-y-2">
+                <p className="text-[10px] font-black text-stone-400 uppercase tracking-widest">{t("profile.total_earnings")}</p>
+                <h4 className="text-3xl font-black text-primary tracking-tighter">{formatPrice(mySales.reduce((acc, s) => acc + s.amount, 0))}</h4>
+              </div>
+              <div className="p-8 bg-white dark:bg-stone-900 rounded-[2.5rem] border border-stone-100 dark:border-stone-800 shadow-xl shadow-stone-200/20 dark:shadow-none space-y-2">
+                <p className="text-[10px] font-black text-stone-400 uppercase tracking-widest">{t("profile.active_listings")}</p>
+                <h4 className="text-3xl font-black text-stone-900 dark:text-white tracking-tighter">{myListings.length}</h4>
+              </div>
+              <div className="p-8 bg-white dark:bg-stone-900 rounded-[2.5rem] border border-stone-100 dark:border-stone-800 shadow-xl shadow-stone-200/20 dark:shadow-none space-y-2">
+                <p className="text-[10px] font-black text-stone-400 uppercase tracking-widest">{t("profile.received_offers_count")}</p>
+                <h4 className="text-3xl font-black text-secondary tracking-tighter">{receivedOffers.length}</h4>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+              <div className="p-10 bg-white dark:bg-stone-900 rounded-[3rem] border border-stone-100 dark:border-stone-800 shadow-2xl shadow-stone-200/10 space-y-8">
+                <h3 className="text-xl font-black text-stone-900 dark:text-white tracking-tighter uppercase">{t("profile.sales_performance")}</h3>
+                <div className="h-64 flex items-end gap-4 px-4">
+                  {[40, 70, 45, 90, 65, 85, 100].map((h, i) => (
+                    <div key={i} className="flex-1 space-y-3">
+                      <motion.div 
+                        initial={{ height: 0 }}
+                        animate={{ height: `${h}%` }}
+                        className="w-full bg-primary/10 rounded-t-xl relative group"
+                      >
+                        <div className="absolute inset-0 bg-primary opacity-0 group-hover:opacity-100 transition-opacity rounded-t-xl" />
+                      </motion.div>
+                      <p className="text-[8px] font-black text-stone-400 text-center uppercase tracking-widest">{t("profile.day")} {i + 1}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <div className="p-10 bg-white dark:bg-stone-900 rounded-[3rem] border border-stone-100 dark:border-stone-800 shadow-2xl shadow-stone-200/10 space-y-8">
+                <h3 className="text-xl font-black text-stone-900 dark:text-white tracking-tighter uppercase">{t("profile.recent_activity")}</h3>
+                <div className="space-y-6">
+                  {mySales.slice(0, 3).map((sale) => (
+                    <div key={sale.id} className="flex items-center gap-4 p-4 bg-stone-50 dark:bg-stone-800 rounded-2xl border border-stone-100 dark:border-stone-700">
+                      <div className="w-10 h-10 bg-green-100 text-green-600 rounded-xl flex items-center justify-center">
+                        <ShoppingBag className="w-5 h-5" />
+                      </div>
+                      <div className="flex-1">
+                        <p className="text-xs font-black text-stone-900 dark:text-white">{t("profile.sold_notification", { title: sale.bookTitle })}</p>
+                        <p className="text-[10px] text-stone-400 font-medium">{new Date(sale.createdAt).toLocaleDateString()}</p>
+                      </div>
+                      <p className="text-sm font-black text-primary">{formatPrice(sale.amount)}</p>
+                    </div>
+                  ))}
+                  {receivedOffers.slice(0, 2).map((offer) => (
+                    <div key={offer.id} className="flex items-center gap-4 p-4 bg-stone-50 dark:bg-stone-800 rounded-2xl border border-stone-100 dark:border-stone-700">
+                      <div className="w-10 h-10 bg-blue-100 text-blue-600 rounded-xl flex items-center justify-center">
+                        <Tag className="w-5 h-5" />
+                      </div>
+                      <div className="flex-1">
+                        <p className="text-xs font-black text-stone-900 dark:text-white">{t("profile.new_offer_notification", { title: offer.bookTitle })}</p>
+                        <p className="text-[10px] text-stone-400 font-medium">{new Date(offer.createdAt).toLocaleDateString()}</p>
+                      </div>
+                      <p className="text-sm font-black text-secondary">{formatPrice(offer.amount)}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
         ) : activeTab === "earnings" ? (
           <div className="space-y-12">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">

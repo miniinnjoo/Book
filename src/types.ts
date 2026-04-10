@@ -11,6 +11,7 @@ export interface UserProfile {
   isPhoneVerified?: boolean;
   booksSold?: number;
   role: "user" | "admin";
+  isVerified?: boolean;
   rating?: number;
   reviewCount?: number;
   createdAt: string;
@@ -27,6 +28,9 @@ export interface BookListing {
   price: number;
   images: string[];
   description: string;
+  isbn?: string;
+  publisher?: string;
+  year?: string;
   status: "available" | "sold" | "pending";
   createdAt: string;
   isFeatured?: boolean;
@@ -86,7 +90,7 @@ export interface ChatMessage {
 export interface AppNotification {
   id: string;
   userId: string;
-  type: "message" | "order" | "offer";
+  type: "message" | "order" | "offer" | "review" | "system";
   title: string;
   message: string;
   link?: string;

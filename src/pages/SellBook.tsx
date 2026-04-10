@@ -22,6 +22,9 @@ export default function SellBook() {
     condition: "good",
     price: "",
     description: "",
+    isbn: "",
+    publisher: "",
+    year: "",
     images: [] as string[],
   });
 
@@ -203,6 +206,39 @@ export default function SellBook() {
                 placeholder={t("sell.price_placeholder")}
               />
             </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 md:gap-6">
+            <div className="space-y-2">
+              <label className="text-[9px] font-black text-stone-400 dark:text-stone-500 uppercase tracking-[0.2em] ml-1">ISBN</label>
+              <input
+                type="text"
+                value={formData.isbn}
+                onChange={(e) => setFormData({ ...formData, isbn: e.target.value })}
+                className="w-full px-5 py-3 bg-stone-50 dark:bg-stone-50 border border-stone-100 dark:border-stone-200 rounded-xl focus:outline-none focus:border-primary focus:ring-4 focus:ring-primary/5 transition-all font-medium text-stone-900 text-sm"
+                placeholder="978-..."
+              />
+            </div>
+            <div className="space-y-2">
+              <label className="text-[9px] font-black text-stone-400 dark:text-stone-500 uppercase tracking-[0.2em] ml-1">{t("sell.publisher") || "دار النشر"}</label>
+              <input
+                type="text"
+                value={formData.publisher}
+                onChange={(e) => setFormData({ ...formData, publisher: e.target.value })}
+                className="w-full px-5 py-3 bg-stone-50 dark:bg-stone-50 border border-stone-100 dark:border-stone-200 rounded-xl focus:outline-none focus:border-primary focus:ring-4 focus:ring-primary/5 transition-all font-medium text-stone-900 text-sm"
+                placeholder={t("sell.publisher_placeholder") || "اسم دار النشر"}
+              />
+            </div>
+            <div className="space-y-2">
+              <label className="text-[9px] font-black text-stone-400 dark:text-stone-500 uppercase tracking-[0.2em] ml-1">{t("sell.year") || "سنة النشر"}</label>
+              <input
+                type="text"
+                value={formData.year}
+                onChange={(e) => setFormData({ ...formData, year: e.target.value })}
+                className="w-full px-5 py-3 bg-stone-50 dark:bg-stone-50 border border-stone-100 dark:border-stone-200 rounded-xl focus:outline-none focus:border-primary focus:ring-4 focus:ring-primary/5 transition-all font-medium text-stone-900 text-sm"
+                placeholder="2024"
+              />
+            </div>
+          </div>
 
           <div className="space-y-2">
             <div className="flex items-center justify-between px-1">

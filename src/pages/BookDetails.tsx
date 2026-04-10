@@ -213,21 +213,21 @@ export default function BookDetails() {
   if (!book) return <div className="py-24 text-center">Book not found.</div>;
 
   return (
-    <div className="space-y-12">
+    <div className="space-y-6 md:space-y-12 pb-24">
       <button 
         onClick={() => navigate(-1)} 
-        className="flex items-center gap-3 text-stone-400 hover:text-primary transition-colors font-black text-xs uppercase tracking-[0.2em]"
+        className="flex items-center gap-2 md:gap-3 text-stone-400 hover:text-primary transition-colors font-black text-[10px] md:text-xs uppercase tracking-[0.2em]"
       >
-        <ArrowLeft className="w-4 h-4" />
+        <ArrowLeft className="w-3 h-3 md:w-4 md:h-4" />
         {t("nav.browse")}
       </button>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-16">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 md:gap-16">
         {/* Left: Images */}
         <motion.div 
           initial={{ opacity: 0, x: -20 }}
           animate={{ opacity: 1, x: 0 }}
-          className="space-y-4 md:space-y-6"
+          className="space-y-3 md:space-y-6"
         >
           <div className="aspect-[3/4] rounded-2xl md:rounded-[2.5rem] overflow-hidden border border-stone-100 dark:border-stone-800 shadow-2xl shadow-stone-200/50 dark:shadow-none">
             <img
@@ -237,9 +237,9 @@ export default function BookDetails() {
               referrerPolicy="no-referrer"
             />
           </div>
-          <div className="grid grid-cols-4 gap-3 md:gap-4">
+          <div className="grid grid-cols-4 gap-2 md:gap-4">
             {book.images.map((img, i) => (
-              <div key={i} className="aspect-square rounded-xl md:rounded-2xl overflow-hidden border-2 border-stone-100 dark:border-stone-800 cursor-pointer hover:border-primary transition-all">
+              <div key={i} className="aspect-square rounded-lg md:rounded-2xl overflow-hidden border-2 border-stone-100 dark:border-stone-800 cursor-pointer hover:border-primary transition-all">
                 <img src={img} alt="" className="w-full h-full object-cover" referrerPolicy="no-referrer" />
               </div>
             ))}
@@ -250,45 +250,66 @@ export default function BookDetails() {
         <motion.div 
           initial={{ opacity: 0, x: 20 }}
           animate={{ opacity: 1, x: 0 }}
-          className="space-y-10"
+          className="space-y-6 md:space-y-10"
         >
-          <div className="space-y-4">
+          <div className="space-y-3 md:space-y-4">
             <div className="flex items-center gap-2">
-              <span className="px-3 py-1 bg-stone-50 text-stone-400 rounded-full text-[9px] font-black uppercase tracking-[0.2em] border border-stone-100">
+              <span className="px-2 md:px-3 py-0.5 md:py-1 bg-stone-50 dark:bg-stone-800 text-stone-400 rounded-full text-[8px] md:text-[9px] font-black uppercase tracking-[0.2em] border border-stone-100 dark:border-stone-700">
                 {t(`category.${book.category.toLowerCase()}`)}
               </span>
-              <span className="px-3 py-1 bg-primary text-white rounded-full text-[9px] font-black uppercase tracking-[0.2em] shadow-lg shadow-primary/20">
+              <span className="px-2 md:px-3 py-0.5 md:py-1 bg-primary text-white rounded-full text-[8px] md:text-[9px] font-black uppercase tracking-[0.2em] shadow-lg shadow-primary/20">
                 {t(`condition.${book.condition.replace("-", "_")}`)}
               </span>
             </div>
             <div className="flex items-center justify-between gap-4">
-              <h1 className="text-4xl md:text-5xl lg:text-6xl font-black tracking-tighter text-stone-900 dark:text-white leading-[0.95] flex-1">
+              <h1 className="text-2xl md:text-5xl lg:text-6xl font-black tracking-tighter text-stone-900 dark:text-white leading-[1] flex-1">
                 {book.title}
               </h1>
               {auth.currentUser?.uid === book.sellerId && (
                 <button
                   onClick={() => navigate(`/book/${book.id}/edit`)}
-                  className="p-3 bg-stone-100 dark:bg-stone-800 text-stone-900 dark:text-white rounded-xl hover:bg-primary hover:text-white transition-all shadow-sm"
+                  className="p-2 md:p-3 bg-stone-100 dark:bg-stone-800 text-stone-900 dark:text-white rounded-lg md:rounded-xl hover:bg-primary hover:text-white transition-all shadow-sm"
                 >
-                  <Edit3 className="w-5 h-5" />
+                  <Edit3 className="w-4 h-4 md:w-5 md:h-5" />
                 </button>
               )}
             </div>
-            <p className="text-xl text-stone-400 font-medium italic">
+            <p className="text-base md:text-xl text-stone-400 font-medium italic">
               {t("book.by") || "بواسطة"} {book.author}
             </p>
           </div>
 
-          <div className="flex items-center justify-between p-8 bg-white dark:bg-stone-900 rounded-[2rem] border border-stone-100 dark:border-stone-800 shadow-xl shadow-stone-200/10">
+          <div className="flex items-center justify-between p-6 md:p-8 bg-white dark:bg-stone-900 rounded-2xl md:rounded-[2rem] border border-stone-100 dark:border-stone-800 shadow-xl shadow-stone-200/10 dark:shadow-none">
             <div className="space-y-1">
-              <p className="text-[9px] font-black text-stone-400 uppercase tracking-[0.3em]">{t("filter.price")}</p>
-              <p className="text-3xl md:text-4xl font-black text-primary tracking-tighter">{formatPrice(book.price)}</p>
+              <p className="text-[8px] md:text-[9px] font-black text-stone-400 uppercase tracking-[0.3em]">{t("filter.price")}</p>
+              <p className="text-2xl md:text-4xl font-black text-primary tracking-tighter">{formatPrice(book.price)}</p>
             </div>
           </div>
 
-          <div className="space-y-3">
-            <h3 className="text-[9px] font-black text-stone-400 uppercase tracking-[0.3em]">{t("book.description") || "الوصف"}</h3>
-            <p className="text-stone-500 dark:text-stone-400 leading-relaxed text-lg font-medium">
+          <div className="grid grid-cols-3 gap-4">
+            {book.isbn && (
+              <div className="space-y-1">
+                <p className="text-[8px] font-black text-stone-400 uppercase tracking-[0.3em]">ISBN</p>
+                <p className="text-xs font-black text-stone-900 dark:text-white">{book.isbn}</p>
+              </div>
+            )}
+            {book.publisher && (
+              <div className="space-y-1">
+                <p className="text-[8px] font-black text-stone-400 uppercase tracking-[0.3em]">{t("sell.publisher") || "الناشر"}</p>
+                <p className="text-xs font-black text-stone-900 dark:text-white">{book.publisher}</p>
+              </div>
+            )}
+            {book.year && (
+              <div className="space-y-1">
+                <p className="text-[8px] font-black text-stone-400 uppercase tracking-[0.3em]">{t("sell.year") || "السنة"}</p>
+                <p className="text-xs font-black text-stone-900 dark:text-white">{book.year}</p>
+              </div>
+            )}
+          </div>
+
+          <div className="space-y-2 md:space-y-3">
+            <h3 className="text-[8px] md:text-[9px] font-black text-stone-400 uppercase tracking-[0.3em]">{t("book.description") || "الوصف"}</h3>
+            <p className="text-stone-500 dark:text-stone-400 leading-relaxed text-sm md:text-lg font-medium">
               {book.description}
             </p>
           </div>
@@ -332,63 +353,63 @@ export default function BookDetails() {
           <motion.div 
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="p-8 md:p-12 bg-white dark:bg-stone-900 rounded-[3rem] border border-stone-100 dark:border-stone-800 shadow-2xl flex flex-col lg:flex-row items-center justify-between gap-8 overflow-hidden relative"
+            className="p-6 md:p-12 bg-white dark:bg-stone-900 rounded-[2rem] md:rounded-[3rem] border border-stone-100 dark:border-stone-800 shadow-2xl flex flex-col lg:flex-row items-center justify-between gap-6 md:gap-8 overflow-hidden relative"
           >
             <div className="absolute top-0 right-0 w-64 h-64 bg-primary/5 rounded-full -translate-y-1/2 translate-x-1/2 blur-3xl"></div>
             <div className="absolute bottom-0 left-0 w-64 h-64 bg-secondary/5 rounded-full translate-y-1/2 -translate-x-1/2 blur-3xl"></div>
             
-            <div className="space-y-4 text-center lg:text-left relative z-10">
-              <h3 className="text-3xl md:text-4xl font-black text-stone-900 dark:text-white tracking-tighter leading-none">{t("book.ready_to_buy") || "جاهز للشراء؟"}</h3>
-              <p className="text-lg text-stone-500 dark:text-stone-400 font-medium max-w-xl leading-relaxed">
+            <div className="space-y-2 md:space-y-4 text-center lg:text-left relative z-10">
+              <h3 className="text-2xl md:text-4xl font-black text-stone-900 dark:text-white tracking-tighter leading-none">{t("book.ready_to_buy") || "جاهز للشراء؟"}</h3>
+              <p className="text-sm md:text-lg text-stone-500 dark:text-stone-400 font-medium max-w-xl leading-relaxed">
                 {t("book.secure_copy") || "احصل على نسختك من"} <span className="text-primary font-black">"{book.title}"</span> {t("book.now") || "الآن"}. 
               </p>
             </div>
-            <div className="flex flex-col sm:flex-row items-center gap-4 w-full lg:w-auto relative z-10">
+            <div className="flex flex-col sm:flex-row items-center gap-3 md:gap-4 w-full lg:w-auto relative z-10">
               <button
                 onClick={toggleWishlist}
-                className={`p-6 rounded-2xl border-2 transition-all duration-500 ${
+                className={`p-4 md:p-6 rounded-xl md:rounded-2xl border-2 transition-all duration-500 ${
                   isInWishlist 
-                    ? "bg-rose-50 border-rose-200 text-rose-500 shadow-xl shadow-rose-200/50" 
+                    ? "bg-rose-50 dark:bg-rose-900/20 border-rose-200 dark:border-rose-800 text-rose-500 shadow-xl shadow-rose-200/50" 
                     : "bg-white dark:bg-stone-800 border-stone-100 dark:border-stone-700 text-stone-300 hover:border-rose-500 hover:text-rose-500 hover:shadow-xl hover:shadow-rose-200/50"
                 }`}
               >
-                <Heart className={`w-6 h-6 ${isInWishlist ? "fill-current" : ""}`} />
+                <Heart className={`w-5 h-5 md:w-6 md:h-6 ${isInWishlist ? "fill-current" : ""}`} />
               </button>
               
-              <div className="flex flex-col gap-3 w-full sm:w-auto">
+              <div className="flex flex-col gap-2 md:gap-3 w-full sm:w-auto">
                 <button
                   onClick={handleCheckout}
                   disabled={checkoutLoading || book.sellerId === auth.currentUser?.uid}
-                  className="px-10 py-5 bg-primary text-white rounded-2xl font-black text-lg hover:bg-primary/90 transition-all duration-500 flex items-center justify-center gap-4 shadow-xl shadow-primary/20 disabled:bg-stone-200 disabled:shadow-none group"
+                  className="px-6 md:px-10 py-4 md:py-5 bg-primary text-white rounded-xl md:rounded-2xl font-black text-base md:text-lg hover:bg-primary/90 transition-all duration-500 flex items-center justify-center gap-3 md:gap-4 shadow-xl shadow-primary/20 disabled:bg-stone-200 dark:disabled:bg-stone-800 disabled:shadow-none group"
                 >
-                  <Zap className="w-6 h-6 group-hover:scale-110 transition-transform" />
+                  <Zap className="w-5 h-5 md:w-6 md:h-6 group-hover:scale-110 transition-transform" />
                   {t("book.buy")} — {formatPrice(book.price)}
                 </button>
 
                 <button
                   onClick={handleAddToCart}
                   disabled={cartLoading || isInCart || book.sellerId === auth.currentUser?.uid}
-                  className="px-10 py-5 bg-white dark:bg-stone-800 text-primary border-2 border-primary rounded-2xl font-black text-lg hover:bg-primary/5 transition-all duration-500 flex items-center justify-center gap-4 shadow-xl shadow-primary/5 disabled:opacity-50"
+                  className="px-6 md:px-10 py-4 md:py-5 bg-white dark:bg-stone-800 text-primary border-2 border-primary rounded-xl md:rounded-2xl font-black text-base md:text-lg hover:bg-primary/5 transition-all duration-500 flex items-center justify-center gap-3 md:gap-4 shadow-xl shadow-primary/5 disabled:opacity-50"
                 >
-                  <ShoppingCart className="w-6 h-6" />
+                  <ShoppingCart className="w-5 h-5 md:w-6 md:h-6" />
                   {isInCart ? t("book.already_in_cart") : t("book.add_to_cart")}
                 </button>
                 
-                <div className="flex gap-3">
+                <div className="flex gap-2 md:gap-3">
                   <button
                     onClick={handleContactSeller}
                     disabled={book.sellerId === auth.currentUser?.uid}
-                    className="flex-1 px-6 py-4 bg-white dark:bg-stone-800 text-stone-900 dark:text-white border-2 border-stone-100 dark:border-stone-700 rounded-2xl font-black text-xs uppercase tracking-widest hover:border-primary transition-all flex items-center justify-center gap-2 disabled:opacity-50"
+                    className="flex-1 px-4 md:px-6 py-3 md:py-4 bg-white dark:bg-stone-800 text-stone-900 dark:text-white border-2 border-stone-100 dark:border-stone-700 rounded-xl md:rounded-2xl font-black text-[10px] md:text-xs uppercase tracking-widest hover:border-primary transition-all flex items-center justify-center gap-2 disabled:opacity-50"
                   >
-                    <MessageSquare className="w-4 h-4" />
+                    <MessageSquare className="w-3 h-3 md:w-4 md:h-4" />
                     {t("book.message") || "مراسلة"}
                   </button>
                   <button
                     onClick={() => setIsOfferModalOpen(true)}
                     disabled={book.sellerId === auth.currentUser?.uid}
-                    className="flex-1 px-6 py-4 bg-secondary text-white rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-secondary/90 transition-all shadow-lg shadow-secondary/20 flex items-center justify-center gap-2 disabled:opacity-50"
+                    className="flex-1 px-4 md:px-6 py-3 md:py-4 bg-secondary text-white rounded-xl md:rounded-2xl font-black text-[10px] md:text-xs uppercase tracking-widest hover:bg-secondary/90 transition-all shadow-lg shadow-secondary/20 flex items-center justify-center gap-2 disabled:opacity-50"
                   >
-                    <TrendingUp className="w-4 h-4" />
+                    <TrendingUp className="w-3 h-3 md:w-4 md:h-4" />
                     {t("book.offer") || "عرض"}
                   </button>
                 </div>

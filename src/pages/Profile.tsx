@@ -5,7 +5,7 @@ import { collection, query, where, getDocs, orderBy, doc, getDoc, updateDoc, add
 import { useEffect, useState } from "react";
 import { BookListing, Transaction, UserProfile, Offer } from "@/src/types";
 import BookCard from "@/src/components/BookCard";
-import { User, Package, ShoppingBag, Settings, LogOut, Star, Clock, ShieldCheck, Heart, Check, X as CloseIcon, Phone, Mail, Camera, MessageSquare, TrendingUp, Tag, Truck } from "lucide-react";
+import { User, Package, ShoppingBag, Settings, LogOut, Star, Clock, ShieldCheck, Heart, Check, X as CloseIcon, Phone, Mail, Camera, MessageSquare, TrendingUp, Tag, Truck, Grid, Share2, Bookmark, DollarSign } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { formatPrice, cn } from "@/src/lib/utils";
@@ -229,139 +229,109 @@ export default function Profile() {
 
   return (
     <div className="space-y-12">
-      {/* Profile Header */}
-      <div className="relative bg-white dark:bg-stone-900 rounded-2xl md:rounded-[2.5rem] border border-stone-100 dark:border-stone-800 shadow-2xl shadow-stone-200/10 dark:shadow-none overflow-hidden">
-        {/* Cover Photo */}
-        <div className="h-48 md:h-56 w-full relative group">
-          <img 
-            src={profileData?.coverURL || "https://images.unsplash.com/photo-1516979187457-637abb4f9353?auto=format&fit=crop&q=80&w=2000"} 
-            alt="Cover" 
-            className="w-full h-full object-cover"
-          />
-          <div className="absolute inset-0 bg-black/20 group-hover:bg-black/40 transition-all duration-500"></div>
-        </div>
-
-        <div className="px-6 md:px-12 pb-8 md:pb-12 mt-4 relative z-10">
-          <div className="flex flex-col md:flex-row items-end gap-6 md:gap-10">
-            <div className="relative -mt-16 md:-mt-20">
-              <img 
-                src={profileData?.photoURL || `https://ui-avatars.com/api/?name=${user.displayName}`} 
-                alt="" 
-                className="w-32 h-32 md:w-36 md:h-36 rounded-2xl md:rounded-[2rem] border-4 md:border-8 border-white dark:border-stone-900 shadow-2xl object-cover bg-white dark:bg-stone-800"
-              />
-              {isVerified && (
-                <div className="absolute -bottom-1.5 -right-1.5 w-10 h-10 md:w-12 md:h-12 bg-blue-500 rounded-xl md:rounded-2xl flex items-center justify-center text-white shadow-lg shadow-blue-500/20 border-2 md:border-4 border-white">
-                  <ShieldCheck className="w-5 h-5 md:w-6 md:h-6" />
-                </div>
-              )}
-            </div>
-            
-            <div className="flex-1 text-center md:text-left rtl:md:text-right space-y-3 pb-2">
-              <div className="space-y-1">
-                <div className="flex items-center justify-center md:justify-start gap-3">
-                  <h1 className="text-3xl md:text-4xl font-black tracking-tighter text-stone-900 dark:text-white">
-                    {profileData?.displayName || (isOwnProfile ? user?.displayName : "Anonymous")}
-                  </h1>
-                </div>
-              </div>
-              
-              {profileData?.bio && (
-                <p className="text-sm md:text-base text-stone-500 dark:text-stone-400 font-medium max-w-2xl leading-relaxed">
-                  {profileData.bio}
-                </p>
-              )}
-
-              <div className="flex flex-wrap items-center justify-center md:justify-start gap-3">
-                <div className="flex items-center gap-1.5 px-3 py-1.5 bg-stone-50 dark:bg-stone-800 rounded-xl text-[9px] font-black text-stone-600 dark:text-stone-400 uppercase tracking-widest border border-stone-100 dark:border-stone-700">
-                  <Star className="w-3 h-3 fill-current text-secondary" />
-                  {t("profile.rating")} {profileData?.rating || "0.0"} ({profileData?.reviewCount || 0})
-                </div>
-                <div className="flex items-center gap-2 px-4 py-2 bg-stone-50 rounded-2xl text-[10px] font-black text-stone-600 uppercase tracking-widest border border-stone-100">
-                  <Clock className="w-3.5 h-3.5" />
-                  {t("profile.joined")} {profileData?.createdAt ? new Date(profileData.createdAt).toLocaleDateString(i18n.language === 'ar' ? 'ar-EG' : 'en-US') : "..."}
-                </div>
-                {isVerified ? (
-                  <div className="flex items-center gap-2 px-4 py-2 bg-blue-50 text-blue-600 rounded-2xl text-[10px] font-black uppercase tracking-widest border border-blue-100">
-                    <ShieldCheck className="w-3.5 h-3.5" />
-                    {t("profile.verified")}
+      {/* Instagram Style Header */}
+      <div className="bg-white dark:bg-stone-900 md:rounded-[2.5rem] md:border md:border-stone-100 md:dark:border-stone-800 md:shadow-2xl md:shadow-stone-200/10 md:dark:shadow-none overflow-hidden">
+        <div className="px-4 md:px-12 py-8 md:py-12">
+          <div className="flex flex-col gap-8">
+            {/* Top Row: Avatar and Stats */}
+            <div className="flex items-center gap-6 md:gap-12">
+              <div className="relative shrink-0">
+                <div className="w-20 h-20 md:w-36 md:h-36 rounded-full p-1 bg-gradient-to-tr from-amber-400 via-primary to-secondary">
+                  <div className="w-full h-full rounded-full border-2 md:border-4 border-white dark:border-stone-900 overflow-hidden bg-stone-100 dark:bg-stone-800">
+                    <img 
+                      src={profileData?.photoURL || `https://ui-avatars.com/api/?name=${profileData?.displayName || user?.displayName || "User"}`} 
+                      alt="" 
+                      className="w-full h-full object-cover"
+                    />
                   </div>
-                ) : (
-                  <div className="flex flex-col sm:flex-row items-center gap-3">
-                    <div className="group relative">
-                      <div className="flex items-center gap-2 px-4 py-2 bg-stone-100 text-stone-400 rounded-2xl text-[10px] font-black uppercase tracking-widest border border-stone-200 cursor-help">
-                        <ShieldCheck className="w-3.5 h-3.5" />
-                        {t("profile.not_verified") || "غير موثق"}
-                      </div>
-                      <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-4 w-64 p-6 bg-stone-900 text-white rounded-3xl text-xs font-medium opacity-0 group-hover:opacity-100 transition-all duration-500 pointer-events-none shadow-2xl z-50">
-                        <p className="mb-4 font-black uppercase tracking-widest text-[10px] text-secondary">{t("profile.verify_req")}</p>
-                        <ul className="space-y-3">
-                          <li className="flex items-center gap-3">
-                            {profileData?.isEmailVerified ? <Check className="w-4 h-4 text-green-400" /> : <CloseIcon className="w-4 h-4 text-primary" />}
-                            {t("profile.req_email")}
-                          </li>
-                          <li className="flex items-center gap-3">
-                            {profileData?.isPhoneVerified ? <Check className="w-4 h-4 text-green-400" /> : <CloseIcon className="w-4 h-4 text-primary" />}
-                            {t("profile.req_phone")}
-                          </li>
-                          <li className="flex items-center gap-3">
-                            {(profileData?.booksSold || 0) > 100 ? <Check className="w-4 h-4 text-green-400" /> : <CloseIcon className="w-4 h-4 text-primary" />}
-                            {t("profile.req_sales")} ({profileData?.booksSold || 0}/100)
-                          </li>
-                          <li className="flex items-center gap-3">
-                            {(profileData?.rating || 0) > 4.5 ? <Check className="w-4 h-4 text-green-400" /> : <CloseIcon className="w-4 h-4 text-primary" />}
-                            {t("profile.req_rating")} ({profileData?.rating || 0})
-                          </li>
-                        </ul>
-                        <div className="absolute top-full left-1/2 -translate-x-1/2 border-8 border-transparent border-t-stone-900"></div>
-                      </div>
-                    </div>
-                    {isOwnProfile && (
-                      <button 
-                        onClick={async () => {
-                          if (profileData?.isEmailVerified && profileData?.isPhoneVerified) {
-                            await updateDoc(doc(db, "users", user.uid), { isVerified: true });
-                            await fetchProfile();
-                          } else {
-                            alert("يرجى إكمال متطلبات التوثيق أولاً");
-                          }
-                        }}
-                        className="px-4 py-2 bg-primary/10 text-primary rounded-2xl text-[10px] font-black uppercase tracking-widest hover:bg-primary hover:text-white transition-all"
-                      >
-                        {t("profile.request_verify") || "طلب توثيق"}
-                      </button>
-                    )}
+                </div>
+                {isVerified && (
+                  <div className="absolute bottom-0 right-0 w-6 h-6 md:w-10 md:h-10 bg-blue-500 rounded-full flex items-center justify-center text-white border-2 md:border-4 border-white dark:border-stone-900">
+                    <ShieldCheck className="w-3 h-3 md:w-6 md:h-6" />
                   </div>
                 )}
               </div>
+
+              <div className="flex-1 flex justify-around md:justify-start md:gap-16">
+                <div className="text-center md:text-right">
+                  <p className="text-lg md:text-2xl font-black text-stone-900 dark:text-white">{myListings.length}</p>
+                  <p className="text-[10px] md:text-xs font-bold text-stone-400 uppercase tracking-widest">{t("profile.listings") || "الكتب"}</p>
+                </div>
+                <div className="text-center md:text-right">
+                  <p className="text-lg md:text-2xl font-black text-stone-900 dark:text-white">{profileData?.booksSold || 0}</p>
+                  <p className="text-[10px] md:text-xs font-bold text-stone-400 uppercase tracking-widest">{t("profile.sales") || "المبيعات"}</p>
+                </div>
+                <div className="text-center md:text-right">
+                  <p className="text-lg md:text-2xl font-black text-stone-900 dark:text-white">{profileData?.rating || "0.0"}</p>
+                  <p className="text-[10px] md:text-xs font-bold text-stone-400 uppercase tracking-widest">{t("profile.rating") || "التقييم"}</p>
+                </div>
+              </div>
             </div>
 
-            <div className="flex flex-col gap-3 min-w-[200px] pb-4">
-              {isOwnProfile ? (
-                <>
-                  <button 
-                    onClick={() => setIsEditing(true)}
-                    className="w-full px-8 py-4 bg-stone-900 text-white rounded-2xl font-black uppercase tracking-widest text-xs hover:bg-stone-800 transition-all shadow-xl shadow-stone-900/20 flex items-center justify-center gap-3"
-                  >
-                    <Settings className="w-4 h-4" />
-                    {t("profile.edit")}
-                  </button>
-                  <button 
-                    onClick={handleLogout}
-                    className="w-full px-8 py-4 bg-stone-50 text-stone-400 rounded-2xl font-black uppercase tracking-widest text-xs hover:bg-primary/10 hover:text-primary transition-all flex items-center justify-center gap-3"
-                  >
-                    <LogOut className="w-4 h-4" />
-                    {t("profile.logout")}
-                  </button>
-                </>
-              ) : (
-                <button 
-                  onClick={() => navigate("/chat", { state: { sellerId: targetUid } })}
-                  className="w-full px-8 py-4 bg-primary text-white rounded-2xl font-black uppercase tracking-widest text-xs hover:bg-primary/90 transition-all shadow-xl shadow-primary/20 flex items-center justify-center gap-3"
-                >
-                  <MessageSquare className="w-4 h-4" />
-                  {t("book.contact_seller") || "تواصل مع البائع"}
-                </button>
-              )}
+            {/* Bio Section */}
+            <div className="space-y-4">
+              <div className="space-y-1">
+                <h1 className="text-xl md:text-2xl font-black text-stone-900 dark:text-white flex items-center gap-2">
+                  {profileData?.displayName || (isOwnProfile ? user?.displayName : "Anonymous")}
+                  {isVerified && <ShieldCheck className="w-5 h-5 text-blue-500 fill-current" />}
+                </h1>
+                {profileData?.bio && (
+                  <p className="text-sm md:text-base text-stone-600 dark:text-stone-400 font-medium leading-relaxed whitespace-pre-wrap">
+                    {profileData.bio}
+                  </p>
+                )}
+                {profileData?.address && (
+                  <p className="text-xs text-stone-400 font-medium flex items-center gap-1">
+                    <Truck className="w-3 h-3" />
+                    {profileData.address}
+                  </p>
+                )}
+              </div>
+
+              {/* Action Buttons */}
+              <div className="flex flex-wrap gap-2 pt-2">
+                {isOwnProfile ? (
+                  <>
+                    <button 
+                      onClick={() => setIsEditing(true)}
+                      className="flex-1 md:flex-none px-6 py-2.5 bg-stone-100 dark:bg-stone-800 text-stone-900 dark:text-white rounded-xl font-bold text-sm hover:bg-stone-200 dark:hover:bg-stone-700 transition-all"
+                    >
+                      {t("profile.edit")}
+                    </button>
+                    <button 
+                      onClick={() => {
+                        const url = window.location.href;
+                        navigator.clipboard.writeText(url);
+                        alert("تم نسخ رابط الملف الشخصي");
+                      }}
+                      className="flex-1 md:flex-none px-6 py-2.5 bg-stone-100 dark:bg-stone-800 text-stone-900 dark:text-white rounded-xl font-bold text-sm hover:bg-stone-200 dark:hover:bg-stone-700 transition-all flex items-center justify-center gap-2"
+                    >
+                      <Share2 className="w-4 h-4" />
+                      {t("common.share") || "مشاركة"}
+                    </button>
+                    <button 
+                      onClick={handleLogout}
+                      className="w-10 h-10 flex items-center justify-center bg-stone-100 dark:bg-stone-800 text-rose-500 rounded-xl hover:bg-rose-50 transition-all"
+                    >
+                      <LogOut className="w-5 h-5" />
+                    </button>
+                  </>
+                ) : (
+                  <>
+                    <button 
+                      onClick={() => navigate("/chat", { state: { sellerId: targetUid } })}
+                      className="flex-1 md:flex-none px-8 py-2.5 bg-primary text-white rounded-xl font-bold text-sm hover:opacity-90 transition-all shadow-lg shadow-primary/20"
+                    >
+                      {t("book.contact_seller") || "تواصل مع البائع"}
+                    </button>
+                    <button 
+                      className="w-10 h-10 flex items-center justify-center bg-stone-100 dark:bg-stone-800 text-stone-900 dark:text-white rounded-xl"
+                    >
+                      <User className="w-5 h-5" />
+                    </button>
+                  </>
+                )}
+              </div>
             </div>
           </div>
         </div>
@@ -491,113 +461,165 @@ export default function Profile() {
         )}
       </AnimatePresence>
 
-      {/* Tabs */}
-      <div className="space-y-10">
-        <div className="flex items-center gap-12 border-b border-stone-100">
+      {/* Tabs - Instagram Style */}
+      <div className="space-y-6">
+        <div className="flex items-center justify-around border-t border-stone-100 dark:border-stone-800">
           <button
             onClick={() => setActiveTab("listings")}
-            className={`pb-6 text-sm font-black uppercase tracking-[0.2em] transition-all relative ${
-              activeTab === "listings" ? "text-primary" : "text-stone-400 hover:text-stone-600"
-            }`}
+            className={cn(
+              "flex-1 py-4 flex flex-col items-center gap-1 transition-all relative",
+              activeTab === "listings" ? "text-primary" : "text-stone-400"
+            )}
           >
-            {isOwnProfile ? t("profile.my_listings") : t("profile.listings") || "العروض"} ({myListings.length})
+            <Grid className="w-6 h-6" />
+            <span className="text-[10px] font-bold uppercase tracking-widest hidden md:block">{t("profile.listings")}</span>
             {activeTab === "listings" && (
-              <motion.div layoutId="tab" className="absolute bottom-0 left-0 right-0 h-1.5 bg-primary rounded-full" />
+              <motion.div layoutId="tab-indicator" className="absolute top-0 left-0 right-0 h-0.5 bg-primary" />
             )}
           </button>
           {isOwnProfile && (
             <button
               onClick={() => setActiveTab("dashboard")}
-              className={`pb-6 text-sm font-black uppercase tracking-[0.2em] transition-all relative ${
-                activeTab === "dashboard" ? "text-primary" : "text-stone-400 hover:text-stone-600"
-              }`}
-            >
-              {t("profile.dashboard") || "لوحة التحكم"}
-              {activeTab === "dashboard" && (
-                <motion.div layoutId="tab" className="absolute bottom-0 left-0 right-0 h-1.5 bg-primary rounded-full" />
+              className={cn(
+                "flex-1 py-4 flex flex-col items-center gap-1 transition-all relative",
+                activeTab === "dashboard" ? "text-primary" : "text-stone-400"
               )}
-            </button>
-          )}
-          {isOwnProfile && (
-            <button
-              onClick={() => setActiveTab("earnings")}
-              className={`pb-6 text-sm font-black uppercase tracking-[0.2em] transition-all relative ${
-                activeTab === "earnings" ? "text-primary" : "text-stone-400 hover:text-stone-600"
-              }`}
             >
-              {t("profile.earnings")}
-              {activeTab === "earnings" && (
-                <motion.div layoutId="tab" className="absolute bottom-0 left-0 right-0 h-1.5 bg-primary rounded-full" />
+              <TrendingUp className="w-6 h-6" />
+              <span className="text-[10px] font-bold uppercase tracking-widest hidden md:block">{t("profile.dashboard")}</span>
+              {activeTab === "dashboard" && (
+                <motion.div layoutId="tab-indicator" className="absolute top-0 left-0 right-0 h-0.5 bg-primary" />
               )}
             </button>
           )}
           {isOwnProfile && (
             <button
               onClick={() => setActiveTab("purchases")}
-              className={`pb-6 text-sm font-black uppercase tracking-[0.2em] transition-all relative ${
-                activeTab === "purchases" ? "text-primary" : "text-stone-400 hover:text-stone-600"
-              }`}
+              className={cn(
+                "flex-1 py-4 flex flex-col items-center gap-1 transition-all relative",
+                activeTab === "purchases" ? "text-primary" : "text-stone-400"
+              )}
             >
-              {t("profile.my_purchases") || "مشترياتي"}
+              <ShoppingBag className="w-6 h-6" />
+              <span className="text-[10px] font-bold uppercase tracking-widest hidden md:block">{t("profile.my_purchases")}</span>
               {activeTab === "purchases" && (
-                <motion.div layoutId="tab" className="absolute bottom-0 left-0 right-0 h-1.5 bg-primary rounded-full" />
+                <motion.div layoutId="tab-indicator" className="absolute top-0 left-0 right-0 h-0.5 bg-primary" />
+              )}
+            </button>
+          )}
+          {isOwnProfile && (
+            <button
+              onClick={() => setActiveTab("earnings")}
+              className={cn(
+                "flex-1 py-4 flex flex-col items-center gap-1 transition-all relative",
+                activeTab === "earnings" ? "text-primary" : "text-stone-400"
+              )}
+            >
+              <DollarSign className="w-6 h-6" />
+              <span className="text-[10px] font-bold uppercase tracking-widest hidden md:block">{t("profile.earnings")}</span>
+              {activeTab === "earnings" && (
+                <motion.div layoutId="tab-indicator" className="absolute top-0 left-0 right-0 h-0.5 bg-primary" />
               )}
             </button>
           )}
           {isOwnProfile && (
             <button
               onClick={() => setActiveTab("offers")}
-              className={`pb-6 text-sm font-black uppercase tracking-[0.2em] transition-all relative ${
-                activeTab === "offers" ? "text-primary" : "text-stone-400 hover:text-stone-600"
-              }`}
+              className={cn(
+                "flex-1 py-4 flex flex-col items-center gap-1 transition-all relative",
+                activeTab === "offers" ? "text-primary" : "text-stone-400"
+              )}
             >
-              {t("profile.offers") || "العروض"}
+              <Tag className="w-6 h-6" />
+              <span className="text-[10px] font-bold uppercase tracking-widest hidden md:block">{t("profile.offers")}</span>
               {activeTab === "offers" && (
-                <motion.div layoutId="tab" className="absolute bottom-0 left-0 right-0 h-1.5 bg-primary rounded-full" />
+                <motion.div layoutId="tab-indicator" className="absolute top-0 left-0 right-0 h-0.5 bg-primary" />
+              )}
+            </button>
+          )}
+          {isOwnProfile && (
+            <button
+              onClick={() => setActiveTab("wishlist")}
+              className={cn(
+                "flex-1 py-4 flex flex-col items-center gap-1 transition-all relative",
+                activeTab === "wishlist" ? "text-primary" : "text-stone-400"
+              )}
+            >
+              <Bookmark className="w-6 h-6" />
+              <span className="text-[10px] font-bold uppercase tracking-widest hidden md:block">{t("nav.wishlist")}</span>
+              {activeTab === "wishlist" && (
+                <motion.div layoutId="tab-indicator" className="absolute top-0 left-0 right-0 h-0.5 bg-primary" />
               )}
             </button>
           )}
           <button
             onClick={() => setActiveTab("reviews")}
-            className={`pb-6 text-sm font-black uppercase tracking-[0.2em] transition-all relative ${
-              activeTab === "reviews" ? "text-primary" : "text-stone-400 hover:text-stone-600"
-            }`}
+            className={cn(
+              "flex-1 py-4 flex flex-col items-center gap-1 transition-all relative",
+              activeTab === "reviews" ? "text-primary" : "text-stone-400"
+            )}
           >
-            {t("profile.reviews") || "التقييمات"} ({profileData?.reviewCount || 0})
+            <Star className="w-6 h-6" />
+            <span className="text-[10px] font-bold uppercase tracking-widest hidden md:block">{t("profile.reviews")}</span>
             {activeTab === "reviews" && (
-              <motion.div layoutId="tab" className="absolute bottom-0 left-0 right-0 h-1.5 bg-primary rounded-full" />
+              <motion.div layoutId="tab-indicator" className="absolute top-0 left-0 right-0 h-0.5 bg-primary" />
             )}
           </button>
         </div>
 
         {loading ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-            {[1, 2, 3, 4].map((i) => (
-              <div key={i} className="aspect-[3/4] bg-stone-50 rounded-[2rem] animate-pulse border border-stone-100"></div>
+          <div className="grid grid-cols-3 gap-1 md:gap-8">
+            {[1, 2, 3, 4, 5, 6].map((i) => (
+              <div key={i} className="aspect-square bg-stone-100 dark:bg-stone-800 animate-pulse"></div>
             ))}
           </div>
         ) : activeTab === "listings" ? (
           myListings.length > 0 ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+            <div className="grid grid-cols-3 gap-1 md:gap-8">
               {myListings.map((book) => (
-                <BookCard 
-                  key={book.id} 
-                  book={book} 
-                  onDelete={(id: string) => setMyListings(prev => prev.filter(b => b.id !== id))} 
-                />
+                <div key={book.id} className="aspect-square relative group cursor-pointer overflow-hidden" onClick={() => navigate(`/book/${book.id}`)}>
+                  <img src={book.images[0]} alt={book.title} className="w-full h-full object-cover" />
+                  <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-4 text-white">
+                    <div className="flex items-center gap-1">
+                      <Heart className="w-4 h-4 fill-current" />
+                      <span className="text-sm font-bold">{book.wishlistCount || 0}</span>
+                    </div>
+                    <div className="flex items-center gap-1">
+                      <MessageSquare className="w-4 h-4 fill-current" />
+                      <span className="text-sm font-bold">{book.viewCount || 0}</span>
+                    </div>
+                  </div>
+                </div>
               ))}
             </div>
           ) : (
-            <div className="py-32 text-center space-y-8 bg-stone-50/30 rounded-[3rem] border border-dashed border-stone-200">
-              <div className="w-24 h-24 bg-white rounded-[2rem] flex items-center justify-center mx-auto shadow-sm">
-                <Package className="w-10 h-10 text-stone-200" />
+            <div className="py-20 text-center space-y-4">
+              <div className="w-20 h-20 bg-stone-100 dark:bg-stone-800 rounded-full flex items-center justify-center mx-auto">
+                <Package className="w-10 h-10 text-stone-400" />
               </div>
-              <div className="space-y-4">
-                <p className="text-stone-500 font-medium text-lg">{t("profile.no_listings")}</p>
-                <button onClick={() => navigate("/sell")} className="px-8 py-4 bg-primary text-white rounded-2xl font-black uppercase tracking-widest text-xs hover:bg-primary/90 transition-all shadow-lg shadow-primary/20">
+              <p className="text-stone-500 font-bold">{t("profile.no_listings")}</p>
+              {isOwnProfile && (
+                <button onClick={() => navigate("/sell")} className="text-primary font-bold text-sm">
                   {t("profile.start_selling")}
                 </button>
+              )}
+            </div>
+          )
+        ) : activeTab === "wishlist" ? (
+          myWishlist.length > 0 ? (
+            <div className="grid grid-cols-3 gap-1 md:gap-8">
+              {myWishlist.map((book) => (
+                <div key={book.id} className="aspect-square relative group cursor-pointer overflow-hidden" onClick={() => navigate(`/book/${book.id}`)}>
+                  <img src={book.images[0]} alt={book.title} className="w-full h-full object-cover" />
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="py-20 text-center space-y-4">
+              <div className="w-20 h-20 bg-stone-100 dark:bg-stone-800 rounded-full flex items-center justify-center mx-auto">
+                <Bookmark className="w-10 h-10 text-stone-400" />
               </div>
+              <p className="text-stone-500 font-bold">{t("profile.no_wishlist") || "قائمة الأمنيات فارغة"}</p>
             </div>
           )
         ) : activeTab === "dashboard" ? (

@@ -164,6 +164,7 @@ export default function SellBook() {
                 >
                   <option value="">{t("sell.select_category")}</option>
                   <option value="Fiction">{t("category.fiction")}</option>
+                  <option value="Novel">{t("category.novel")}</option>
                   <option value="Science">{t("category.science")}</option>
                   <option value="Education">{t("category.education")}</option>
                   <option value="History">{t("category.history")}</option>

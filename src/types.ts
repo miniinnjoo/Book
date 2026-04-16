@@ -14,6 +14,8 @@ export interface UserProfile {
   isVerified?: boolean;
   rating?: number;
   reviewCount?: number;
+  followersCount?: number;
+  followingCount?: number;
   createdAt: string;
 }
 

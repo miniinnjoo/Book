@@ -1,11 +1,11 @@
 import { useTranslation } from "react-i18next";
 import { auth, db } from "@/src/firebase";
 import { useAuthState } from "react-firebase-hooks/auth";
-import { collection, query, where, getDocs, orderBy, doc, getDoc, updateDoc, addDoc, setDoc } from "firebase/firestore";
+import { collection, query, where, getDocs, orderBy, doc, getDoc, updateDoc, addDoc, setDoc, deleteDoc } from "firebase/firestore";
 import { useEffect, useState } from "react";
 import { BookListing, Transaction, UserProfile, Offer } from "@/src/types";
 import BookCard from "@/src/components/BookCard";
-import { User, Package, ShoppingBag, Settings, LogOut, Star, Clock, ShieldCheck, Heart, Check, X as CloseIcon, Phone, Mail, Camera, MessageSquare, TrendingUp, Tag, Truck, Grid, Share2, Bookmark, DollarSign } from "lucide-react";
+import { User, Package, ShoppingBag, Settings, LogOut, Star, Clock, ShieldCheck, Heart, Check, X as CloseIcon, Phone, Mail, Camera, MessageSquare, TrendingUp, Tag, Truck, Grid, Share2, Bookmark, DollarSign, AlertTriangle } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { formatPrice, cn } from "@/src/lib/utils";
@@ -25,14 +25,17 @@ export default function Profile() {
   const [mySales, setMySales] = useState<Transaction[]>([]);
   const [myOffers, setMyOffers] = useState<Offer[]>([]);
   const [receivedOffers, setReceivedOffers] = useState<Offer[]>([]);
+  const [isFollowing, setIsFollowing] = useState(false);
+  const [followersCount, setFollowersCount] = useState(0);
+  const [followingCount, setFollowingCount] = useState(0);
 
   const [profileData, setProfileData] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState<"listings" | "purchases" | "wishlist" | "reviews" | "earnings" | "offers" | "dashboard">("listings");
+  const [activeTab, setActiveTab] = useState<"listings" | "purchases" | "wishlist" | "reviews" | "earnings" | "offers" | "dashboard" | "settings">("listings");
 
   useEffect(() => {
     const tab = searchParams.get("tab");
-    if (tab && ["listings", "purchases", "wishlist", "reviews", "earnings", "offers", "dashboard"].includes(tab)) {
+    if (tab && ["listings", "purchases", "wishlist", "reviews", "earnings", "offers", "dashboard", "settings"].includes(tab)) {
       setActiveTab(tab as any);
     }
   }, [searchParams]);
@@ -60,6 +63,8 @@ export default function Profile() {
     if (docSnap.exists()) {
       const data = docSnap.data() as UserProfile;
       setProfileData(data);
+      setFollowersCount(data.followersCount || 0);
+      setFollowingCount(data.followingCount || 0);
       if (isOwnProfile) {
         setEditForm({
           displayName: data.displayName || "",
@@ -70,6 +75,13 @@ export default function Profile() {
           phoneNumber: data.phoneNumber || ""
         });
       }
+    }
+
+    // Check if following
+    if (user && !isOwnProfile) {
+      const followRef = doc(db, "follows", `${user.uid}_${targetUid}`);
+      const followSnap = await getDoc(followRef);
+      setIsFollowing(followSnap.exists());
     }
   };
 
@@ -105,6 +117,7 @@ export default function Profile() {
         uid: user.uid,
         displayName: updateData.displayName,
         photoURL: updateData.photoURL,
+        coverURL: updateData.coverURL,
         bio: updateData.bio,
       }, { merge: true });
       
@@ -220,6 +233,57 @@ export default function Profile() {
     }
   };
 
+  const handleFollow = async () => {
+    if (!user || !targetUid || isOwnProfile) return;
+    const followId = `${user.uid}_${targetUid}`;
+    const followRef = doc(db, "follows", followId);
+
+    try {
+      if (isFollowing) {
+        await deleteDoc(followRef);
+        setIsFollowing(false);
+        setFollowersCount(prev => Math.max(0, prev - 1));
+      } else {
+        await setDoc(followRef, {
+          followerId: user.uid,
+          followingId: targetUid,
+          createdAt: new Date().toISOString()
+        });
+        setIsFollowing(true);
+        setFollowersCount(prev => prev + 1);
+
+        // Notify seller
+        await addDoc(collection(db, "notifications"), {
+          userId: targetUid,
+          type: "system",
+          title: "متابع جديد",
+          message: `${user.displayName || "مستخدم"} بدأ في متابعتك`,
+          link: `/profile/${user.uid}`,
+          read: false,
+          createdAt: new Date().toISOString(),
+        });
+      }
+    } catch (error) {
+      console.error("Error toggling follow:", error);
+    }
+  };
+
+  const handleDeleteAccount = async () => {
+    if (!user) return;
+    const confirmDelete = window.confirm(t("profile.delete_confirm") || "هل أنت متأكد أنك تريد حذف حسابك؟ لا يمكن التراجع عن هذا الإجراء.");
+    if (!confirmDelete) return;
+
+    try {
+      // In a real app, you'd delete all user data. 
+      // Here we'll just sign out and maybe mark the user as deleted in Firestore.
+      await updateDoc(doc(db, "users", user.uid), { isDeleted: true });
+      await auth.signOut();
+      navigate("/");
+    } catch (error) {
+      console.error("Error deleting account:", error);
+    }
+  };
+
   if (!targetUid) return null;
 
   const isVerified = profileData?.isEmailVerified && 
@@ -228,110 +292,106 @@ export default function Profile() {
                      (profileData?.rating || 0) > 4.5;
 
   return (
-    <div className="space-y-12">
-      {/* Instagram Style Header */}
-      <div className="bg-white dark:bg-stone-900 md:rounded-[2.5rem] md:border md:border-stone-100 md:dark:border-stone-800 md:shadow-2xl md:shadow-stone-200/10 md:dark:shadow-none overflow-hidden">
-        <div className="px-4 md:px-12 py-8 md:py-12">
-          <div className="flex flex-col gap-8">
-            {/* Top Row: Avatar and Stats */}
-            <div className="flex items-center gap-6 md:gap-12">
-              <div className="relative shrink-0">
-                <div className="w-20 h-20 md:w-36 md:h-36 rounded-full p-1 bg-gradient-to-tr from-amber-400 via-primary to-secondary">
-                  <div className="w-full h-full rounded-full border-2 md:border-4 border-white dark:border-stone-900 overflow-hidden bg-stone-100 dark:bg-stone-800">
-                    <img 
-                      src={profileData?.photoURL || `https://ui-avatars.com/api/?name=${profileData?.displayName || user?.displayName || "User"}`} 
-                      alt="" 
-                      className="w-full h-full object-cover"
-                    />
-                  </div>
-                </div>
-                {isVerified && (
-                  <div className="absolute bottom-0 right-0 w-6 h-6 md:w-10 md:h-10 bg-blue-500 rounded-full flex items-center justify-center text-white border-2 md:border-4 border-white dark:border-stone-900">
-                    <ShieldCheck className="w-3 h-3 md:w-6 md:h-6" />
-                  </div>
-                )}
-              </div>
+    <div className="space-y-8">
+      {/* YouTube Style Header */}
+      <div className="bg-white dark:bg-stone-900 md:rounded-[2.5rem] overflow-hidden border border-stone-100 dark:border-stone-800 shadow-2xl shadow-stone-200/10 dark:shadow-none">
+        {/* Cover Photo */}
+        <div className="h-32 md:h-64 bg-stone-100 dark:bg-stone-800 relative group">
+          {profileData?.coverURL ? (
+            <img src={profileData.coverURL} alt="" className="w-full h-full object-cover" />
+          ) : (
+            <div className="w-full h-full bg-gradient-to-r from-stone-200 to-stone-300 dark:from-stone-800 dark:to-stone-700" />
+          )}
+          {isOwnProfile && (
+            <button 
+              onClick={() => setIsEditing(true)}
+              className="absolute bottom-4 right-4 p-2 bg-black/50 text-white rounded-lg opacity-0 group-hover:opacity-100 transition-opacity backdrop-blur-sm"
+            >
+              <Camera className="w-5 h-5" />
+            </button>
+          )}
+        </div>
 
-              <div className="flex-1 flex justify-around md:justify-start md:gap-16">
-                <div className="text-center md:text-right">
-                  <p className="text-lg md:text-2xl font-black text-stone-900 dark:text-white">{myListings.length}</p>
-                  <p className="text-[10px] md:text-xs font-bold text-stone-400 uppercase tracking-widest">{t("profile.listings") || "الكتب"}</p>
-                </div>
-                <div className="text-center md:text-right">
-                  <p className="text-lg md:text-2xl font-black text-stone-900 dark:text-white">{profileData?.booksSold || 0}</p>
-                  <p className="text-[10px] md:text-xs font-bold text-stone-400 uppercase tracking-widest">{t("profile.sales") || "المبيعات"}</p>
-                </div>
-                <div className="text-center md:text-right">
-                  <p className="text-lg md:text-2xl font-black text-stone-900 dark:text-white">{profileData?.rating || "0.0"}</p>
-                  <p className="text-[10px] md:text-xs font-bold text-stone-400 uppercase tracking-widest">{t("profile.rating") || "التقييم"}</p>
-                </div>
+        <div className="px-4 md:px-12 pb-8">
+          <div className="flex flex-col md:flex-row gap-6 md:gap-10 -mt-10 md:-mt-16 items-start">
+            {/* Profile Picture */}
+            <div className="relative shrink-0">
+              <div className="w-24 h-24 md:w-44 md:h-44 rounded-full border-4 md:border-8 border-white dark:border-stone-900 overflow-hidden bg-stone-100 dark:bg-stone-800 shadow-xl">
+                <img 
+                  src={profileData?.photoURL || `https://ui-avatars.com/api/?name=${profileData?.displayName || user?.displayName || "User"}`} 
+                  alt="" 
+                  className="w-full h-full object-cover"
+                />
               </div>
+              {isVerified && (
+                <div className="absolute bottom-2 right-2 w-6 h-6 md:w-10 md:h-10 bg-blue-500 rounded-full flex items-center justify-center text-white border-2 md:border-4 border-white dark:border-stone-900">
+                  <ShieldCheck className="w-3 h-3 md:w-6 md:h-6" />
+                </div>
+              )}
             </div>
 
-            {/* Bio Section */}
-            <div className="space-y-4">
-              <div className="space-y-1">
-                <h1 className="text-xl md:text-2xl font-black text-stone-900 dark:text-white flex items-center gap-2">
-                  {profileData?.displayName || (isOwnProfile ? user?.displayName : "Anonymous")}
-                  {isVerified && <ShieldCheck className="w-5 h-5 text-blue-500 fill-current" />}
-                </h1>
-                {profileData?.bio && (
-                  <p className="text-sm md:text-base text-stone-600 dark:text-stone-400 font-medium leading-relaxed whitespace-pre-wrap">
-                    {profileData.bio}
-                  </p>
-                )}
-                {profileData?.address && (
-                  <p className="text-xs text-stone-400 font-medium flex items-center gap-1">
-                    <Truck className="w-3 h-3" />
-                    {profileData.address}
-                  </p>
-                )}
+            {/* Info Section */}
+            <div className="flex-1 pt-2 md:pt-20 space-y-4">
+              <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                <div className="space-y-1">
+                  <h1 className="text-2xl md:text-4xl font-black text-stone-900 dark:text-white flex items-center gap-2">
+                    {profileData?.displayName || (isOwnProfile ? user?.displayName : "Anonymous")}
+                    {isVerified && <ShieldCheck className="w-6 h-6 text-blue-500 fill-current" />}
+                  </h1>
+                  <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm font-bold text-stone-400">
+                    <span>@{profileData?.uid.slice(0, 8)}</span>
+                    <span>•</span>
+                    <span>{followersCount} {t("profile.followers") || "متابع"}</span>
+                    <span>•</span>
+                    <span>{myListings.length} {t("profile.listings") || "فيديو/كتاب"}</span>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-3">
+                  {isOwnProfile ? (
+                    <>
+                      <button 
+                        onClick={() => setIsEditing(true)}
+                        className="px-6 py-2.5 bg-stone-100 dark:bg-stone-800 text-stone-900 dark:text-white rounded-full font-bold text-sm hover:bg-stone-200 dark:hover:bg-stone-700 transition-all"
+                      >
+                        {t("profile.edit_channel") || "تعديل القناة"}
+                      </button>
+                      <button 
+                        onClick={() => setActiveTab("settings")}
+                        className="p-2.5 bg-stone-100 dark:bg-stone-800 text-stone-900 dark:text-white rounded-full hover:bg-stone-200 dark:hover:bg-stone-700 transition-all"
+                      >
+                        <Settings className="w-5 h-5" />
+                      </button>
+                    </>
+                  ) : (
+                    <>
+                      <button 
+                        onClick={handleFollow}
+                        className={cn(
+                          "px-8 py-2.5 rounded-full font-bold text-sm transition-all shadow-lg",
+                          isFollowing 
+                            ? "bg-stone-100 dark:bg-stone-800 text-stone-900 dark:text-white hover:bg-stone-200" 
+                            : "bg-stone-900 dark:bg-white text-white dark:text-stone-900 hover:opacity-90"
+                        )}
+                      >
+                        {isFollowing ? (t("profile.following") || "متابع") : (t("profile.follow") || "اشتراك")}
+                      </button>
+                      <button 
+                        onClick={() => navigate("/chat", { state: { sellerId: targetUid } })}
+                        className="p-2.5 bg-stone-100 dark:bg-stone-800 text-stone-900 dark:text-white rounded-full hover:bg-stone-200 dark:hover:bg-stone-700 transition-all"
+                      >
+                        <MessageSquare className="w-5 h-5" />
+                      </button>
+                    </>
+                  )}
+                </div>
               </div>
 
-              {/* Action Buttons */}
-              <div className="flex flex-wrap gap-2 pt-2">
-                {isOwnProfile ? (
-                  <>
-                    <button 
-                      onClick={() => setIsEditing(true)}
-                      className="flex-1 md:flex-none px-6 py-2.5 bg-stone-100 dark:bg-stone-800 text-stone-900 dark:text-white rounded-xl font-bold text-sm hover:bg-stone-200 dark:hover:bg-stone-700 transition-all"
-                    >
-                      {t("profile.edit")}
-                    </button>
-                    <button 
-                      onClick={() => {
-                        const url = window.location.href;
-                        navigator.clipboard.writeText(url);
-                        alert("تم نسخ رابط الملف الشخصي");
-                      }}
-                      className="flex-1 md:flex-none px-6 py-2.5 bg-stone-100 dark:bg-stone-800 text-stone-900 dark:text-white rounded-xl font-bold text-sm hover:bg-stone-200 dark:hover:bg-stone-700 transition-all flex items-center justify-center gap-2"
-                    >
-                      <Share2 className="w-4 h-4" />
-                      {t("common.share") || "مشاركة"}
-                    </button>
-                    <button 
-                      onClick={handleLogout}
-                      className="w-10 h-10 flex items-center justify-center bg-stone-100 dark:bg-stone-800 text-rose-500 rounded-xl hover:bg-rose-50 transition-all"
-                    >
-                      <LogOut className="w-5 h-5" />
-                    </button>
-                  </>
-                ) : (
-                  <>
-                    <button 
-                      onClick={() => navigate("/chat", { state: { sellerId: targetUid } })}
-                      className="flex-1 md:flex-none px-8 py-2.5 bg-primary text-white rounded-xl font-bold text-sm hover:opacity-90 transition-all shadow-lg shadow-primary/20"
-                    >
-                      {t("book.contact_seller") || "تواصل مع البائع"}
-                    </button>
-                    <button 
-                      className="w-10 h-10 flex items-center justify-center bg-stone-100 dark:bg-stone-800 text-stone-900 dark:text-white rounded-xl"
-                    >
-                      <User className="w-5 h-5" />
-                    </button>
-                  </>
-                )}
-              </div>
+              {profileData?.bio && (
+                <p className="text-sm md:text-base text-stone-600 dark:text-stone-400 font-medium leading-relaxed max-w-3xl">
+                  {profileData.bio}
+                </p>
+              )}
             </div>
           </div>
         </div>
@@ -565,6 +625,21 @@ export default function Profile() {
               <motion.div layoutId="tab-indicator" className="absolute top-0 left-0 right-0 h-0.5 bg-primary" />
             )}
           </button>
+          {isOwnProfile && (
+            <button
+              onClick={() => setActiveTab("settings")}
+              className={cn(
+                "flex-1 py-4 flex flex-col items-center gap-1 transition-all relative",
+                activeTab === "settings" ? "text-primary" : "text-stone-400"
+              )}
+            >
+              <Settings className="w-6 h-6" />
+              <span className="text-[10px] font-bold uppercase tracking-widest hidden md:block">{t("profile.settings")}</span>
+              {activeTab === "settings" && (
+                <motion.div layoutId="tab-indicator" className="absolute top-0 left-0 right-0 h-0.5 bg-primary" />
+              )}
+            </button>
+          )}
         </div>
 
         {loading ? (
@@ -923,6 +998,78 @@ export default function Profile() {
               <ReviewForm sellerId={targetUid} onSuccess={fetchProfile} />
             )}
             <ReviewList sellerId={targetUid} />
+          </div>
+        ) : activeTab === "settings" ? (
+          <div className="max-w-3xl mx-auto space-y-12">
+            <div className="space-y-8">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h3 className="text-3xl font-black text-stone-900 dark:text-white tracking-tighter uppercase">{t("profile.account_settings")}</h3>
+                  <p className="text-stone-400 font-medium tracking-tight mt-1">{t("profile.settings_desc") || "إدارة حسابك وتفضيلات الخصوصية"}</p>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <button 
+                  onClick={() => setIsEditing(true)}
+                  className="group relative p-8 bg-white dark:bg-stone-900 rounded-[2.5rem] border border-stone-100 dark:border-stone-800 shadow-xl shadow-stone-200/10 hover:shadow-stone-200/20 dark:hover:shadow-none hover:-translate-y-1 transition-all text-left rtl:text-right overflow-hidden"
+                >
+                  <div className="absolute top-0 right-0 w-32 h-32 bg-blue-500/5 rounded-bl-[100%] translate-x-8 -translate-y-8 group-hover:scale-110 transition-transform" />
+                  <div className="relative z-10 space-y-4">
+                    <div className="w-14 h-14 bg-blue-100 dark:bg-blue-900/30 text-blue-600 rounded-2xl flex items-center justify-center shadow-lg shadow-blue-500/10 transition-transform group-hover:scale-110">
+                      <User className="w-7 h-7" />
+                    </div>
+                    <div>
+                      <h4 className="text-xl font-bold text-stone-900 dark:text-white leading-none">{t("profile.edit_profile")}</h4>
+                      <p className="text-sm text-stone-400 mt-2 font-medium">{t("profile.edit_profile_desc")}</p>
+                    </div>
+                  </div>
+                </button>
+
+                <button 
+                  onClick={() => {
+                    const url = window.location.href;
+                    navigator.clipboard.writeText(url);
+                    alert(t("share.copied"));
+                  }}
+                  className="group relative p-8 bg-white dark:bg-stone-900 rounded-[2.5rem] border border-stone-100 dark:border-stone-800 shadow-xl shadow-stone-200/10 hover:shadow-stone-200/20 dark:hover:shadow-none hover:-translate-y-1 transition-all text-left rtl:text-right overflow-hidden"
+                >
+                  <div className="absolute top-0 right-0 w-32 h-32 bg-amber-500/5 rounded-bl-[100%] translate-x-8 -translate-y-8 group-hover:scale-110 transition-transform" />
+                  <div className="relative z-10 space-y-4">
+                    <div className="w-14 h-14 bg-amber-100 dark:bg-amber-900/30 text-amber-600 rounded-2xl flex items-center justify-center shadow-lg shadow-amber-500/10 transition-transform group-hover:scale-110">
+                      <Share2 className="w-7 h-7" />
+                    </div>
+                    <div>
+                      <h4 className="text-xl font-bold text-stone-900 dark:text-white leading-none">{t("common.share")}</h4>
+                      <p className="text-sm text-stone-400 mt-2 font-medium">{t("profile.share_desc")}</p>
+                    </div>
+                  </div>
+                </button>
+              </div>
+
+              <div className="p-10 bg-rose-50/50 dark:bg-rose-900/10 rounded-[3rem] border border-rose-100 dark:border-rose-900/20 space-y-6">
+                <div className="flex items-start gap-6">
+                  <div className="w-16 h-16 bg-rose-100 dark:bg-rose-900/30 text-rose-600 rounded-[1.5rem] flex items-center justify-center shrink-0">
+                    <AlertTriangle className="w-8 h-8" />
+                  </div>
+                  <div className="space-y-2">
+                    <h4 className="text-2xl font-black text-rose-600 tracking-tight">{t("profile.delete_account")}</h4>
+                    <p className="text-stone-500 dark:text-stone-400 font-medium leading-relaxed max-w-xl">
+                      {t("profile.delete_account_desc")} {t("profile.delete_account_warning") || "سيتم مسح جميع مبيعاتك، تقييماتك، ورسائلك بشكل دائم."}
+                    </p>
+                  </div>
+                </div>
+                <div className="flex justify-end pt-4 border-t border-rose-200/30">
+                  <button 
+                    onClick={handleDeleteAccount}
+                    className="px-8 py-4 bg-rose-600 hover:bg-rose-700 text-white font-black rounded-2xl shadow-xl shadow-rose-600/20 transition-all hover:scale-105 active:scale-95 flex items-center gap-2"
+                  >
+                    <LogOut className="w-5 h-5" />
+                    {t("profile.delete_account")}
+                  </button>
+                </div>
+              </div>
+            </div>
           </div>
         ) : null}
       </div>

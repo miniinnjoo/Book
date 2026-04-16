@@ -11,7 +11,7 @@ interface BookFilterProps {
 export default function BookFilter({ filters, setFilters, onClear }: BookFilterProps) {
   const { t } = useTranslation();
 
-  const categories = ["Fiction", "Science", "Education", "History", "Children", "Biography", "Comics"];
+  const categories = ["Fiction", "Novel", "Science", "Education", "History", "Children", "Biography", "Comics"];
   const languages = ["English", "Arabic", "French", "Spanish", "German"];
   const conditions = ["new", "like-new", "good", "acceptable"];
 
